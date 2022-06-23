@@ -11,18 +11,21 @@ import (
 )
 
 type application struct {
-	token          string
-	errorLogger    *log.Logger
-	infoLogger     *log.Logger
-	discordSession *discordgo.Session
+	discordBot  *discordgo.Session
+	errorLogger *log.Logger
+	infoLogger  *log.Logger
 }
 
 func main() {
-	token := os.Getenv("DISCORD_TOKEN")
 	errLog := log.New(os.Stderr, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
 	infoLog := log.New(os.Stdin, "INFO: ", log.Ldate|log.Ltime)
 
-	dg, err := discordgo.New("Bot " + token)
+	cfg, err := readConfig()
+	if err != nil {
+		errLog.Println(err)
+	}
+
+	dg, err := discordgo.New("Bot " + cfg.DiscordToken)
 	if err != nil {
 		fmt.Println("error creating Discord sesssion,", err)
 		return
@@ -36,10 +39,12 @@ func main() {
 	}
 
 	app := &application{
-		discordSession: dg,
-		errorLogger:    errLog,
-		infoLogger:     infoLog,
+		discordBot:  dg,
+		errorLogger: errLog,
+		infoLogger:  infoLog,
 	}
+
+	fmt.Println(app)
 
 	infoLog.Println("Bot is now running. Press CTRL-C to exit")
 	sc := make(chan os.Signal, 1)

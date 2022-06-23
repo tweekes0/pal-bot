@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -11,7 +10,8 @@ import (
 )
 
 type application struct {
-	discordBot  *discordgo.Session
+	botID       string
+	botCfg   *botConfig
 	errorLogger *log.Logger
 	infoLogger  *log.Logger
 }
@@ -25,30 +25,42 @@ func main() {
 		errLog.Println(err)
 	}
 
-	dg, err := discordgo.New("Bot " + cfg.DiscordToken)
+	bot, err := initializeBot(cfg.DiscordToken)
 	if err != nil {
-		fmt.Println("error creating Discord sesssion,", err)
-		return
+		errLog.Println(err)
 	}
 
-	dg.Identify.Intents = discordgo.IntentsGuildMessages
-	err = dg.Open()
+	botID, err := getBotID(bot)
 	if err != nil {
-		errLog.Println("error opening connection,", err)
-		return
+		errLog.Println(err)
 	}
 
 	app := &application{
-		discordBot:  dg,
+		botID:       botID,
+		botCfg:         cfg,
 		errorLogger: errLog,
 		infoLogger:  infoLog,
 	}
 
-	fmt.Println(app)
+	bot.AddHandler(app.defaultHandler)
 
 	infoLog.Println("Bot is now running. Press CTRL-C to exit")
+
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-sc
-	dg.Close()
+	bot.Close()
+}
+
+func (app *application) defaultHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
+	if m.Author.ID == app.botID {
+		return
+	}
+
+	switch m.Content {
+	case app.botCfg.CommandPrefix + "ping":
+		_, _ = s.ChannelMessageSend(m.ChannelID, "Pong :D")
+	default:
+		return
+	}
 }

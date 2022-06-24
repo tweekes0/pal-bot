@@ -12,7 +12,8 @@ func initializeBot(token string) (*discordgo.Session, error) {
 		return nil, errors.New(ErrDiscordConnection.Error())
 	}
 
-	bot.Identify.Intents = discordgo.IntentsGuildMessages
+	bot.Identify.Intents = discordgo.IntentsGuildMessages | discordgo.IntentsGuildVoiceStates
+
 	err = bot.Open()
 	if err != nil {
 		return nil, errors.New(ErrDiscordSession.Error())

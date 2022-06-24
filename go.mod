@@ -1,4 +1,4 @@
-module github.com/tweekes0/pal-bot-test
+module github.com/tweekes0/pal-bot
 
 go 1.18
 

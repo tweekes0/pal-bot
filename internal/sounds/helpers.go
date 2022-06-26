@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func deleteVideoFile(file *os.File) error {
+func deleteFile(file *os.File) error {
 	err := os.Remove(file.Name())
 	if err != nil {
 		return err

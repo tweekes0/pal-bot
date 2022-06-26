@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 
 	"github.com/kkdai/youtube/v2"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
@@ -36,7 +37,7 @@ func downloadYoutubeVideo(url string) (*os.File, error) {
 	return file, nil
 }
 
-func createAudioFile(url, startTime, duration string) (*os.File, error) {
+func createAACFile(url, startTime, duration string) (*os.File, error) {
 	videoFile, err := downloadYoutubeVideo(url)
 	if err != nil {
 		return nil, err
@@ -54,8 +55,6 @@ func createAudioFile(url, startTime, duration string) (*os.File, error) {
 		kwargs["t"] = duration
 	}
 
-	fmt.Println(kwargs)
-
 	err = ffmpeg.Input(videoFile.Name()).
 		Output(output, kwargs).OverWriteOutput().Run()
 
@@ -68,7 +67,51 @@ func createAudioFile(url, startTime, duration string) (*os.File, error) {
 		return nil, err
 	}
 
-	deleteVideoFile(videoFile)
+	deleteFile(videoFile)
 
 	return audio, nil
+}
+
+func CreateDCAFile(url, startTime, duration string) error {
+	aac, err := createAACFile(url, startTime, duration)
+	if err != nil {
+		return err
+	}
+
+	c1 := exec.Command("ffmpeg", "-i", aac.Name(), "-f", "s16le", "-ar", "48000", "-ac", "2", "pipe:1")
+	c2 := exec.Command("dca")
+
+	c2.Stdin, err = c1.StdoutPipe()
+	if err != nil {
+		return err
+	}
+
+	f, err := os.Create("./audio/test.dca")
+	if err != nil {
+		return err
+	}
+
+	c2.Stdout = f
+
+	err = c2.Start()
+	if err != nil {
+		return err
+	}
+
+	err = c1.Run()
+	if err != nil {
+		return err
+	}
+
+	err = c2.Wait()
+	if err != nil {
+		return err
+	}
+
+	err = deleteFile(aac)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

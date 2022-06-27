@@ -58,16 +58,46 @@ func (m *SoundbiteModel) Get(name string) (*Soundbite, error) {
 	return s, nil
 }
 
+// Get all the soundbites in the soundbites table
+func (m *SoundbiteModel) GetAll() ([]*Soundbite, error) {
+	stmt := `SELECT * FROM soundbites`
+
+	rows, err := m.DB.Query(stmt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	soundbites := []*Soundbite{}
+
+	for rows.Next() {
+		s := &Soundbite{}
+		err = rows.Scan(&s.ID, &s.Name, &s.Username, &s.UserID, &s.FilePath, &s.FileHash, &s.Created)
+		if err != nil {
+			return nil, err
+		}
+
+		soundbites = append(soundbites, s)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return soundbites, nil
+}
+
 // Check whether a soundbite exists based on the name of the command and the filehash
 func (m *SoundbiteModel) Exists(name, hash string) (bool, error) {
 	var exists bool
 
-	stmt := `SELECT EXISTS(SELECT true FROM soundbites where name = ? OR filehash = ?)`
+	stmt := `SELECT EXISTS(SELECT true FROM soundbites WHERE name = ? OR filehash = ?)`
 	err := m.DB.QueryRow(stmt, name, hash).Scan(&exists)
 
 	return exists, err
 }
 
+// Deletes the soundbite if the user_id and name belong to the same record
 func (m *SoundbiteModel) Delete(name, uid string) error {
 	if err := m.userCreatedCommand(name, uid); err != nil {
 		return err

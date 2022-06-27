@@ -1,15 +1,17 @@
 package main
 
 import (
+	// "errors"
 	"fmt"
 	"log"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"syscall"
 
 	"github.com/tweekes0/pal-bot/internal/config"
-	"github.com/tweekes0/pal-bot/internal/sounds"
+	// "github.com/tweekes0/pal-bot/internal/sounds"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -94,18 +96,40 @@ func (app *application) messageCreate(s *discordgo.Session, m *discordgo.Message
 			app.errorLogger.Println(err)
 		}
 
-	case app.botCfg.CommandPrefix + "create":
-		if len(c.args) == 0 {
-			_, _ = s.ChannelMessageSend(m.ChannelID, "I need a youtube link bud " + mention)
+	case app.botCfg.CommandPrefix + "clip":
+		var url string
+		var start string
+		var duration int
+		var err error
+
+		switch len(c.args) {
+		case 0:
+			_, _ = s.ChannelMessageSend(m.ChannelID, "I need a youtube link bud "+mention)
 			return
+		case 1:
+			url = c.args[0]
+			start = "00:00"
+			duration = 10
+		case 2:
+			url = c.args[0]
+			start = c.args[1]
+			duration = 10
+		case 3:
+			url = c.args[0]
+			start = c.args[1]
+			duration, err = strconv.Atoi(c.args[2])
+			if err != nil {
+				app.errorLogger.Println(err)
+				return
+			}
+		default:
 		}
 
-		err := sounds.CreateDCAFile(c.args[0], "", "")
+		err = app.clip(s, m, url, start, duration)
 		if err != nil {
 			app.errorLogger.Println(err)
+			return
 		}
-
-		_, _ = s.ChannelMessageSend(m.ChannelID, "Your sound clip is ready " + mention)
 
 	default:
 		return

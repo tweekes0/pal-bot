@@ -39,7 +39,6 @@ func parseCommand(str string) *botCommand {
 	return c
 }
 
-
 func initializeBot(token string) (*discordgo.Session, error) {
 	bot, err := discordgo.New("Bot " + token)
 	if err != nil {

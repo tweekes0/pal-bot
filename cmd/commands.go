@@ -1,6 +1,11 @@
 package main
 
-import "github.com/bwmarrin/discordgo"
+import (
+	"fmt"
+
+	"github.com/bwmarrin/discordgo"
+	"github.com/tweekes0/pal-bot/internal/sounds"
+)
 
 // Bot will join the voice channel that is specified in config file
 func (app *application) joinVoice(s *discordgo.Session, m *discordgo.MessageCreate) error {
@@ -23,7 +28,7 @@ func (app *application) leaveVoice(s *discordgo.Session, m *discordgo.MessageCre
 	if !app.joinedVoice {
 		return ErrBotNotInVC
 	}
-	
+
 	if err := app.vc.Disconnect(); err != nil {
 		return err
 	}
@@ -52,5 +57,31 @@ func (app *application) playSound(s *discordgo.Session, m *discordgo.MessageCrea
 	}
 
 	app.vc.Speaking(false)
+	return nil
+}
+
+// Bot will create audio file from youtube video
+func (app *application) clip(s *discordgo.Session, m *discordgo.MessageCreate, url, startTime string, duration int) error {
+	var start string
+	var dur int
+
+	switch {
+	case startTime == "":
+		start = ""
+		dur = 10
+	case startTime != "":
+		start = startTime
+		dur = 10
+	case duration > 0 && duration <= 10:
+		start = startTime
+		dur = duration
+	}
+
+	f, err := sounds.CreateDCAFile(url, start, dur)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(f.Name())
 	return nil
 }

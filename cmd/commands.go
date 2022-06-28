@@ -1,10 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"github.com/tweekes0/pal-bot/internal/sounds"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/tweekes0/pal-bot/internal/sounds"
 )
 
 // Bot will join the voice channel that is specified in config file
@@ -58,7 +57,7 @@ func (app *application) playSound(s *discordgo.Session, m *discordgo.MessageCrea
 }
 
 // Bot will create audio file from youtube video
-func (app *application) clip(s *discordgo.Session, m *discordgo.MessageCreate, url, startTime string, duration int) error {
+func (app *application) clip(s *discordgo.Session, m *discordgo.MessageCreate, name, url, startTime string, duration int) error {
 	var start string
 	var dur int
 
@@ -79,6 +78,15 @@ func (app *application) clip(s *discordgo.Session, m *discordgo.MessageCreate, u
 		return err
 	}
 
-	fmt.Println(f.Name())
+	hash, err := sounds.HashFile(f)
+	if err != nil {
+		return err
+	}
+
+	_, err = app.soundbiteModel.Insert(name, m.Author.Username, m.Author.ID, f.Name(), hash)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

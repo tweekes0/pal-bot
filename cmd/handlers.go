@@ -43,26 +43,34 @@ func (app *application) messageCreate(s *discordgo.Session, m *discordgo.Message
 		}
 
 	case app.botCfg.CommandPrefix + "clip":
-		var url string
-		var start string
-		var duration int
-		var err error
+		var (
+			name     string
+			url      string
+			start    string
+			duration int
+			err      error
+		)
 
 		switch len(c.args) {
 		case 0:
-			_, _ = s.ChannelMessageSend(m.ChannelID, "I need a youtube link bud "+mention)
-			return
 		case 1:
-			url = c.args[0]
+			msg := fmt.Sprintf(`clip needs a name and youtube link bud %v`, mention)
+			_, _ = s.ChannelMessageSend(m.ChannelID, msg)
+			return
+		case 2:
+			name = c.args[0]
+			url = c.args[1]
 			start = "00:00"
 			duration = 10
-		case 2:
-			url = c.args[0]
-			start = c.args[1]
-			duration = 10
 		case 3:
-			url = c.args[0]
-			start = c.args[1]
+			name = c.args[0]
+			url = c.args[1]
+			start = c.args[2]
+			duration = 10
+		case 4:
+			name = c.args[0]
+			url = c.args[1]
+			start = c.args[2]
 			duration, err = strconv.Atoi(c.args[2])
 			if err != nil {
 				app.errorLogger.Println(err)
@@ -71,7 +79,7 @@ func (app *application) messageCreate(s *discordgo.Session, m *discordgo.Message
 		default:
 		}
 
-		err = app.clip(s, m, url, start, duration)
+		err = app.clip(s, m, name, url, start, duration)
 		if err != nil {
 			app.errorLogger.Println(err)
 			return

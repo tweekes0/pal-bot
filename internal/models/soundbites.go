@@ -22,8 +22,8 @@ type SoundbiteModel struct {
 
 // Insert Soundbite's metadata into the 'soundbites' table
 func (m *SoundbiteModel) Insert(name, username, uid, filepath, filehash string) (int, error) {
-	stmt := `INSERT INTO soundbites (name, username, user_id, filepath, filehash, created) as 
-	values(?, ?, ?, ?, ?, UTC_TIMESTAMP())`
+	stmt := `INSERT INTO soundbites (name, username, user_id, filepath, filehash, created)  
+	VALUES(?, ?, ?, ?, ?, UTC_TIMESTAMP())`
 
 	res, err := m.DB.Exec(stmt, name, username, uid, filepath, filehash)
 	if err != nil {

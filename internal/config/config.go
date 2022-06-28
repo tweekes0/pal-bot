@@ -7,10 +7,11 @@ import (
 )
 
 type BotConfig struct {
-	DiscordToken   string `toml:"DiscordToken"`
-	CommandPrefix  string `toml:"CommandPrefix"`
-	BotChannelID   string `toml:BotChannelID`
-	VoiceChannelID string `toml:VoiceChannelID`
+	DiscordToken       string `toml:"DiscordToken"`
+	CommandPrefix      string `toml:"CommandPrefix"`
+	BotChannelID       string `toml:BotChannelID`
+	VoiceChannelID     string `toml:VoiceChannelID`
+	DBConnectionString string `toml:DBConnectionString`
 }
 
 func ReadConfig() (*BotConfig, error) {

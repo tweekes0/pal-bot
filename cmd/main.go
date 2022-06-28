@@ -7,17 +7,19 @@ import (
 	"syscall"
 
 	"github.com/tweekes0/pal-bot/internal/config"
+	"github.com/tweekes0/pal-bot/internal/models"
 
 	"github.com/bwmarrin/discordgo"
 )
 
 type application struct {
-	botID       string
-	botCfg      *config.BotConfig
-	errorLogger *log.Logger
-	infoLogger  *log.Logger
-	vc          *discordgo.VoiceConnection
-	joinedVoice bool
+	botID          string
+	botCfg         *config.BotConfig
+	errorLogger    *log.Logger
+	infoLogger     *log.Logger
+	vc             *discordgo.VoiceConnection
+	soundbiteModel *models.SoundbiteModel
+	joinedVoice    bool
 }
 
 func main() {
@@ -26,17 +28,22 @@ func main() {
 
 	cfg, err := config.ReadConfig()
 	if err != nil {
-		errLog.Println(err)
+		errLog.Fatalln(err)
 	}
 
 	bot, err := initializeBot(cfg.DiscordToken)
 	if err != nil {
-		errLog.Println(err)
+		errLog.Fatalln(err)
 	}
 
 	botID, err := getBotID(bot)
 	if err != nil {
-		errLog.Println(err)
+		errLog.Fatalln(err)
+	}
+
+	db, err := openDB(cfg.DBConnectionString)
+	if err != nil {
+		errLog.Fatalln(err)
 	}
 
 	app := &application{
@@ -45,10 +52,10 @@ func main() {
 		botCfg:      cfg,
 		errorLogger: errLog,
 		infoLogger:  infoLog,
+		soundbiteModel: &models.SoundbiteModel{DB: db},
 	}
 
 	bot.AddHandler(app.messageCreate)
-	
 	bot.AddHandler(app.voiceStateChange)
 
 	infoLog.Println("Bot is now running. Press CTRL-C to exit")

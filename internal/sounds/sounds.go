@@ -97,7 +97,8 @@ func CreateDCAFile(url, startTime string, duration int) (*os.File, error) {
 		return nil, err
 	}
 
-	f, err := os.Create("./audio/test.dca")
+	fname := getFilename(aac.Name())
+	f, err := os.Create(fmt.Sprintf("./audio/%v.dca", fname))
 	if err != nil {
 		return nil, err
 	}

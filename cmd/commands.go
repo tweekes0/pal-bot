@@ -19,7 +19,6 @@ func (app *application) joinVoice(s *discordgo.Session, m *discordgo.MessageCrea
 		return err
 	}
 
-	app.joinedVoice = true
 	return nil
 }
 
@@ -32,8 +31,6 @@ func (app *application) leaveVoice(s *discordgo.Session, m *discordgo.MessageCre
 	if err := app.vc.Disconnect(); err != nil {
 		return err
 	}
-
-	app.joinedVoice = false
 
 	return nil
 }

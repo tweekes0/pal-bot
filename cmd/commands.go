@@ -35,14 +35,19 @@ func (app *application) leaveVoice(s *discordgo.Session, m *discordgo.MessageCre
 }
 
 // Bot will load an audio file from disc and play it in the voice channel specified in config file
-func (app *application) playSound(s *discordgo.Session, m *discordgo.MessageCreate, filepath string) error {
+func (app *application) playSound(s *discordgo.Session, m *discordgo.MessageCreate, name string) error {
 	if !app.joinedVoice {
 		if err := app.joinVoice(s, m); err != nil {
 			return err
 		}
 	}
 
-	buf, err := loadSound(filepath)
+	soundbite, err := app.soundbiteModel.Get(name)
+	if err != nil {
+		return err
+	}
+
+	buf, err := loadSound(soundbite.FilePath)
 	if err != nil {
 		return err
 	}

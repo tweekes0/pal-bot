@@ -38,7 +38,12 @@ func (app *application) messageCreate(s *discordgo.Session, m *discordgo.Message
 		}
 
 	case app.botCfg.CommandPrefix + "play":
-		if err := app.playSound(s, m, "./audio/test.dca"); err != nil {
+		if len(c.args) < 1 {
+			return 
+		}
+
+		name := c.args[0]
+		if err := app.playSound(s, m, name); err != nil {
 			app.errorLogger.Println(err)
 		}
 

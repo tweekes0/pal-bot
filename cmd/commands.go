@@ -83,7 +83,7 @@ func (app *application) clip(s *discordgo.Session, m *discordgo.MessageCreate, n
 		return err
 	}
 
-	hash, err := sounds.HashFile(f)
+	hash, err := sounds.HashFile(f.Name())
 	if err != nil {
 		return err
 	}
@@ -98,8 +98,18 @@ func (app *application) clip(s *discordgo.Session, m *discordgo.MessageCreate, n
 
 // Bot will delete the specified sound 
 func (app *application) deleteSound(s *discordgo.Session, m *discordgo.MessageCreate, name string) error {
-	err := app.soundbiteModel.Delete(name, m.Author.ID)
+	sound, err := app.soundbiteModel.Get(name)
 	if err != nil {
+		return err
+	}
+
+	err = app.soundbiteModel.Delete(name, m.Author.ID)
+	if err != nil {
+		return err
+	}
+
+	err = sounds.DeleteFile(sound.FilePath)
+	if err != nil { 
 		return err
 	}
 

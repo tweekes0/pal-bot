@@ -8,8 +8,9 @@ import (
 	"strings"
 )
 
-func deleteFile(file *os.File) error {
-	err := os.Remove(file.Name())
+// remove a file
+func DeleteFile(filename string) error {
+	err := os.Remove(filename)
 	if err != nil {
 		return err
 	}
@@ -18,8 +19,8 @@ func deleteFile(file *os.File) error {
 }
 
 // hashes file and return sha256hash as a string
-func HashFile(file *os.File) (string, error) {
-	f, err := os.Open(file.Name())
+func HashFile(filename string) (string, error) {
+	f, err := os.Open(filename)
 	if err != nil {
 		return "", nil
 	}	

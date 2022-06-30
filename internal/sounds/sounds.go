@@ -78,7 +78,7 @@ func createAACFile(url, startTime string, duration int) (*os.File, error) {
 		return nil, err
 	}
 
-	deleteFile(videoFile)
+	DeleteFile(videoFile.Name())
 
 	return audio, nil
 }
@@ -121,7 +121,7 @@ func CreateDCAFile(url, startTime string, duration int) (*os.File, error) {
 		return nil, err
 	}
 
-	err = deleteFile(aac)
+	err = DeleteFile(aac.Name())
 	if err != nil {
 		return nil, err
 	}

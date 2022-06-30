@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/tweekes0/pal-bot/internal/sounds"
 
 	"github.com/bwmarrin/discordgo"
@@ -46,6 +49,10 @@ func (app *application) playSound(s *discordgo.Session, m *discordgo.MessageCrea
 	if err != nil {
 		return err
 	}
+	
+	if app.isSpeaking {
+		return nil
+	}
 
 	buf, err := loadSound(soundbite.FilePath)
 	if err != nil {
@@ -53,11 +60,13 @@ func (app *application) playSound(s *discordgo.Session, m *discordgo.MessageCrea
 	}
 
 	app.vc.Speaking(true)
+	app.isSpeaking = true
 	for _, b := range buf {
 		app.vc.OpusSend <- b
 	}
 
 	app.vc.Speaking(false)
+	app.isSpeaking = false
 	return nil
 }
 
@@ -113,5 +122,26 @@ func (app *application) deleteSound(s *discordgo.Session, m *discordgo.MessageCr
 		return err
 	}
 
+	return nil
+}
+
+func (app *application) showSounds(s *discordgo.Session, m *discordgo.MessageCreate) error {
+	sounds, err := app.soundbiteModel.GetAll()
+	if err != nil {
+		return err
+	}
+
+	if len(sounds) == 0 {
+		_, _ = s.ChannelMessageSend(m.ChannelID, "there are no sounds :(")
+		return nil
+	}
+
+	var b strings.Builder
+	fmt.Fprint(&b, "Current Sounds: \n")
+	for _, sound := range sounds {
+		fmt.Fprintf(&b, "%v\n", sound.Name)
+	}
+
+	_, _ = s.ChannelMessageSend(m.ChannelID, b.String())
 	return nil
 }

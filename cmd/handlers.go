@@ -67,6 +67,13 @@ func (app *application) messageCreate(s *discordgo.Session, m *discordgo.Message
 		name := c.args[0]
 		if  err := app.deleteSound(s, m, name); err != nil {
 			app.errorLogger.Println(err)
+			return
+		}
+
+	case app.botCfg.CommandPrefix + "sounds":
+		if err := app.showSounds(s, m); err != nil {
+			app.errorLogger.Println(err)
+			return
 		}
 
 	default:

@@ -20,6 +20,7 @@ type application struct {
 	vc             *discordgo.VoiceConnection
 	soundbiteModel *models.SoundbiteModel
 	joinedVoice    bool
+	isSpeaking     bool
 }
 
 func main() {
@@ -47,11 +48,12 @@ func main() {
 	}
 
 	app := &application{
-		joinedVoice: false,
-		botID:       botID,
-		botCfg:      cfg,
-		errorLogger: errLog,
-		infoLogger:  infoLog,
+		joinedVoice:    false,
+		isSpeaking:     false,
+		botID:          botID,
+		botCfg:         cfg,
+		errorLogger:    errLog,
+		infoLogger:     infoLog,
 		soundbiteModel: &models.SoundbiteModel{DB: db},
 	}
 

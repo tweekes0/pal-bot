@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
@@ -19,7 +20,7 @@ type botCommand struct {
 
 func parseCommand(str string) *botCommand {
 	s := strings.Fields(str)
-	
+
 	if len(s) == 0 {
 		return nil
 	}
@@ -27,7 +28,7 @@ func parseCommand(str string) *botCommand {
 	if len(s) == 1 {
 		return &botCommand{
 			command: s[0],
-			args: nil,
+			args:    nil,
 		}
 	}
 
@@ -111,4 +112,43 @@ func openDB(dsn string) (*sql.DB, error) {
 	}
 
 	return db, nil
+}
+
+type clipArgs struct {
+	Name     string
+	Url      string
+	Start    string
+	Duration int
+}
+
+func parseClipCommand(args []string) (*clipArgs, error) {
+	var err error
+
+	c := &clipArgs{}
+	switch len(args) {
+	case 0:
+	case 1:
+		return nil, ErrInvalidClipCommand
+	case 2:
+		c.Name = args[0]
+		c.Url = args[1]
+		c.Start = "00:00"
+		c.Duration = 10
+	case 3:
+		c.Name = args[0]
+		c.Url= args[1]
+		c.Start = args[2]
+		c.Duration = 10
+	case 4:
+		c.Name = args[0]
+		c.Url = args[1]
+		c.Start = args[2]
+		c.Duration, err = strconv.Atoi(args[3])
+		if err != nil {
+			return nil, err
+		}
+	default:
+	}
+
+	return c, nil
 }

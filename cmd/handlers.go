@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
@@ -48,46 +47,27 @@ func (app *application) messageCreate(s *discordgo.Session, m *discordgo.Message
 		}
 
 	case app.botCfg.CommandPrefix + "clip":
-		var (
-			name     string
-			url      string
-			start    string
-			duration int
-			err      error
-		)
-
-		switch len(c.args) {
-		case 0:
-		case 1:
-			msg := fmt.Sprintf(`clip needs a name and youtube link bud %v`, mention)
-			_, _ = s.ChannelMessageSend(m.ChannelID, msg)
-			return
-		case 2:
-			name = c.args[0]
-			url = c.args[1]
-			start = "00:00"
-			duration = 10
-		case 3:
-			name = c.args[0]
-			url = c.args[1]
-			start = c.args[2]
-			duration = 10
-		case 4:
-			name = c.args[0]
-			url = c.args[1]
-			start = c.args[2]
-			duration, err = strconv.Atoi(c.args[2])
-			if err != nil {
-				app.errorLogger.Println(err)
-				return
-			}
-		default:
-		}
-
-		err = app.clip(s, m, name, url, start, duration)
+		args, err := parseClipCommand(c.args)		
 		if err != nil {
 			app.errorLogger.Println(err)
 			return
+		}
+
+		err = app.clip(s, m, args.Name, args.Url, args.Start, args.Duration)
+		if err != nil {
+			app.errorLogger.Println(err)
+			return
+		}
+
+	case app.botCfg.CommandPrefix + "delete": 	
+		if len(c.args) < 1 {
+			return 
+		}
+
+		name := c.args[0]
+		if  err := app.soundbiteModel.Delete(name, m.Author.ID); err != nil {
+			app.errorLogger.Println(err)
+			
 		}
 
 	default:

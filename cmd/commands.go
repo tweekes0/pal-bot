@@ -70,7 +70,7 @@ func (app *application) clip(s *discordgo.Session, m *discordgo.MessageCreate, n
 	case startTime == "":
 		start = ""
 		dur = 10
-	case startTime != "":
+	case startTime != "" && duration > 10:
 		start = startTime
 		dur = 10
 	case duration > 0 && duration <= 10:

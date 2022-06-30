@@ -95,3 +95,13 @@ func (app *application) clip(s *discordgo.Session, m *discordgo.MessageCreate, n
 
 	return nil
 }
+
+// Bot will delete the specified sound 
+func (app *application) deleteSound(s *discordgo.Session, m *discordgo.MessageCreate, name string) error {
+	err := app.soundbiteModel.Delete(name, m.Author.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

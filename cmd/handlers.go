@@ -65,7 +65,7 @@ func (app *application) messageCreate(s *discordgo.Session, m *discordgo.Message
 		}
 
 		name := c.args[0]
-		if  err := app.soundbiteModel.Delete(name, m.Author.ID); err != nil {
+		if  err := app.deleteSound(s, m, name); err != nil {
 			app.errorLogger.Println(err)
 			
 		}

@@ -70,12 +70,11 @@ func (app *application) messageCreate(s *discordgo.Session, m *discordgo.Message
 			return
 		}
 
-	case app.botCfg.CommandPrefix + "sounds":
+	case app.botCfg.CommandPrefix + "sounds":	
 		if err := app.showSounds(s, m); err != nil {
 			app.errorLogger.Println(err)
 			return
 		}
-
 	default:
 		return
 	}
@@ -83,4 +82,7 @@ func (app *application) messageCreate(s *discordgo.Session, m *discordgo.Message
 
 func (app *application) voiceStateChange(s *discordgo.Session, vs *discordgo.VoiceStateUpdate) {
 	app.joinedVoice = !app.joinedVoice
+	if !app.joinedVoice {
+		app.isSpeaking = false
+	}
 }

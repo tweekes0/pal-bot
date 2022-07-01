@@ -56,9 +56,6 @@ func main() {
 		infoLogger:     infoLog,
 		soundbiteModel: &models.SoundbiteModel{DB: db},
 	}
-
-	bot.StateEnabled = true
-	bot.State.TrackVoice = true
 	
 	bot.AddHandler(app.messageCreate)
 	bot.AddHandler(app.voiceStateChange)

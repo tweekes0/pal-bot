@@ -11,12 +11,13 @@ import (
 
 // Bot will join the voice channel that is specified in config file
 func (app *application) joinVoice(s *discordgo.Session, m *discordgo.MessageCreate) error {
-	if app.joinedVoice {
-		return ErrBotAlreadyJoinedVC
+	id := getChannelID(s, m)
+	if id == "" {
+		return ErrUserNotInVC
 	}
 
 	var err error
-	app.vc, err = s.ChannelVoiceJoin(m.GuildID, app.botCfg.VoiceChannelID, false, true)
+	app.vc, err = s.ChannelVoiceJoin(m.GuildID, id, false, true)
 	if err != nil {
 		return err
 	}
@@ -39,10 +40,8 @@ func (app *application) leaveVoice(s *discordgo.Session, m *discordgo.MessageCre
 
 // Bot will load an audio file from disc and play it in the voice channel specified in config file
 func (app *application) playSound(s *discordgo.Session, m *discordgo.MessageCreate, name string) error {
-	if !app.joinedVoice {
-		if err := app.joinVoice(s, m); err != nil {
-			return err
-		}
+	if err := app.joinVoice(s, m); err != nil {
+		return err
 	}
 
 	soundbite, err := app.soundbiteModel.Get(name)

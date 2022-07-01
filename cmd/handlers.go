@@ -38,7 +38,7 @@ func (app *application) messageCreate(s *discordgo.Session, m *discordgo.Message
 
 	case app.botCfg.CommandPrefix + "play":
 		if len(c.args) < 1 {
-			return 
+			return
 		}
 
 		name := c.args[0]
@@ -47,7 +47,7 @@ func (app *application) messageCreate(s *discordgo.Session, m *discordgo.Message
 		}
 
 	case app.botCfg.CommandPrefix + "clip":
-		args, err := parseClipCommand(c.args)		
+		args, err := parseClipCommand(c.args)
 		if err != nil {
 			app.errorLogger.Println(err)
 			return
@@ -59,30 +59,36 @@ func (app *application) messageCreate(s *discordgo.Session, m *discordgo.Message
 			return
 		}
 
-	case app.botCfg.CommandPrefix + "delete": 	
+	case app.botCfg.CommandPrefix + "delete":
 		if len(c.args) < 1 {
-			return 
+			return
 		}
 
 		name := c.args[0]
-		if  err := app.deleteSound(s, m, name); err != nil {
+		if err := app.deleteSound(s, m, name); err != nil {
 			app.errorLogger.Println(err)
 			return
 		}
 
-	case app.botCfg.CommandPrefix + "sounds":	
+	case app.botCfg.CommandPrefix + "sounds":
 		if err := app.showSounds(s, m); err != nil {
 			app.errorLogger.Println(err)
 			return
 		}
+
 	default:
 		return
 	}
 }
 
 func (app *application) voiceStateChange(s *discordgo.Session, vs *discordgo.VoiceStateUpdate) {
-	app.joinedVoice = !app.joinedVoice
-	if !app.joinedVoice {
+	if vs.VoiceState.UserID == app.botID {
 		app.isSpeaking = false
+
+		if vs.VoiceState.ChannelID == "" { // The bot disconnects from a voice channel
+			app.joinedVoice = false
+		} else { // the bot joins a voice channel
+			app.joinedVoice = true
+		}
 	}
 }

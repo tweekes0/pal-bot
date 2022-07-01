@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"encoding/binary"
-	"errors"
 	"io"
 	"os"
 	"strconv"
@@ -45,14 +44,16 @@ func parseCommand(str string) *botCommand {
 func initializeBot(token string) (*discordgo.Session, error) {
 	bot, err := discordgo.New("Bot " + token)
 	if err != nil {
-		return nil, errors.New(ErrDiscordConnection.Error())
+		return nil, ErrDiscordConnection
 	}
 
-	bot.Identify.Intents = discordgo.IntentsGuildMessages | discordgo.IntentsGuildVoiceStates
+	bot.StateEnabled = true
+	bot.State.TrackVoice = true
+	bot.Identify.Intents = discordgo.IntentsGuilds | discordgo.IntentsGuildMessages | discordgo.IntentsGuildVoiceStates 
 
 	err = bot.Open()
 	if err != nil {
-		return nil, errors.New(ErrDiscordSession.Error())
+		return nil, ErrDiscordSession
 	}
 
 	return bot, nil
@@ -151,4 +152,16 @@ func parseClipCommand(args []string) (*clipArgs, error) {
 	}
 
 	return c, nil
+}
+
+func getChannelID(s *discordgo.Session, m *discordgo.MessageCreate) string {
+	for _, guild := range s.State.Guilds {
+		for _, vs := range guild.VoiceStates {
+			if vs.UserID == m.Author.ID {
+				return vs.ChannelID
+			}
+		}
+	}
+
+	return ""
 }

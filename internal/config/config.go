@@ -10,7 +10,6 @@ type BotConfig struct {
 	DiscordToken       string `toml:"DiscordToken"`
 	CommandPrefix      string `toml:"CommandPrefix"`
 	BotChannelID       string `toml:BotChannelID`
-	VoiceChannelID     string `toml:VoiceChannelID`
 	DBConnectionString string `toml:DBConnectionString`
 }
 

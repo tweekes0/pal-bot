@@ -1,0 +1,4 @@
+DiscordToken = "DISCORD_BOT_TOKEN"
+CommandPrefix = "!"
+BotChannelID = "BOT_CHANNEL_ID"
+DBConnectionString = "DATABASE DSN"

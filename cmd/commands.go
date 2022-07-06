@@ -26,7 +26,7 @@ func (app *application) joinVoice(s *discordgo.Session, m *discordgo.MessageCrea
 }
 
 // Bot will leave the voice channel it is currently in
-func (app *application) leaveVoice(s *discordgo.Session, m *discordgo.MessageCreate) error {
+func (app *application) leaveVoice() error {
 	if !app.joinedVoice {
 		return ErrBotNotInVC
 	}
@@ -44,13 +44,13 @@ func (app *application) playSound(s *discordgo.Session, m *discordgo.MessageCrea
 		return err
 	}
 
+	if app.isSpeaking {
+		return nil
+	}
+
 	soundbite, err := app.soundbiteModel.Get(name)
 	if err != nil {
 		return err
-	}
-	
-	if app.isSpeaking {
-		return nil
 	}
 
 	buf, err := loadSound(soundbite.FilePath)
@@ -120,6 +120,8 @@ func (app *application) deleteSound(s *discordgo.Session, m *discordgo.MessageCr
 	if err != nil { 
 		return err
 	}
+
+	_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%v has been deleted\n", name))
 
 	return nil
 }

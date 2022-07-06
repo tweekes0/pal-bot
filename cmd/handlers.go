@@ -32,7 +32,7 @@ func (app *application) messageCreate(s *discordgo.Session, m *discordgo.Message
 		}
 
 	case app.botCfg.CommandPrefix + "leave":
-		if err := app.leaveVoice(s, m); err != nil {
+		if err := app.leaveVoice(); err != nil {
 			app.errorLogger.Println(err)
 		}
 

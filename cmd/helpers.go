@@ -167,9 +167,26 @@ func getChannelID(s *discordgo.Session, m *discordgo.MessageCreate) string {
 	return ""
 }
 
+func getRuntime(start string, duration int) (startTime string, dur int) {
+	switch {
+	case start == "":
+		startTime = ""
+		dur = 10
+	case start != "" && duration > 10:
+		startTime = start
+		dur = 10
+	case duration > 0 && duration <= 10:
+		startTime = start
+		dur = duration
+	}
+
+	return
+}
+
 func createDiscordFile(name string, f *os.File) (*discordgo.File) {
 	return &discordgo.File{
 		Name: fmt.Sprintf("%v.mp3", name),
 		Reader: f,
 	}
 }
+

@@ -44,7 +44,7 @@ func createAACFile(url, startTime string, duration int) (*os.File, error) {
 		return nil, err
 	}
 
-	if startTime == "" && vidDuration > (10 * time.Second) {
+	if startTime == "" && vidDuration > (10*time.Second) {
 		return nil, ErrTooLong
 	}
 
@@ -76,6 +76,7 @@ func createAACFile(url, startTime string, duration int) (*os.File, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer audio.Close()
 
 	DeleteFile(videoFile.Name())
 
@@ -120,5 +121,27 @@ func CreateDCAFile(url, startTime string, duration int) (*os.File, *os.File, err
 		return nil, nil, err
 	}
 
-	return f, aac, nil
+	mp3, err := createMP3File(aac)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return f, mp3, nil
+}
+
+func createMP3File(aac *os.File) (*os.File, error) {
+	mp3, err := os.CreateTemp("", "*.mp3")
+	if err != nil {
+		return nil, err
+	}
+
+	kwargs := ffmpeg.KwArgs{"acodec": "libmp3lame"}
+	err = ffmpeg.Input(aac.Name()).
+		Output(mp3.Name(), kwargs).OverWriteOutput().Run()
+	
+	if err != nil {
+		return nil, err
+	}
+
+	return mp3, nil
 }

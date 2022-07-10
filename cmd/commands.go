@@ -71,22 +71,9 @@ func (app *application) playSound(s *discordgo.Session, m *discordgo.MessageCrea
 
 // Bot will create audio file from youtube video
 func (app *application) clip(s *discordgo.Session, m *discordgo.MessageCreate, name, url, startTime string, duration int) error {
-	var start string
-	var dur int
+	start, dur := getRuntime(startTime, duration)
 
-	switch {
-	case startTime == "":
-		start = ""
-		dur = 10
-	case startTime != "" && duration > 10:
-		start = startTime
-		dur = 10
-	case duration > 0 && duration <= 10:
-		start = startTime
-		dur = duration
-	}
-
-	f, aac, err := sounds.CreateDCAFile(url, start, dur)
+	f, mp3, err := sounds.CreateDCAFile(url, start, dur)
 	if err != nil {
 		return err
 	}
@@ -103,12 +90,14 @@ func (app *application) clip(s *discordgo.Session, m *discordgo.MessageCreate, n
 
 	ms := &discordgo.MessageSend{
 		Content: fmt.Sprintf("Your clip is ready. Play it with **!play %v**", name),
-		Files: []*discordgo.File{createDiscordFile(name, aac)},
+		Files: []*discordgo.File{createDiscordFile(name, mp3)},
 	}
 
 	_,_ = s.ChannelMessageSendComplex(m.ChannelID, ms)
 
-	err = sounds.DeleteFile(aac.Name())
+	app.infoLogger.Println(mp3.Name())
+	
+	err = sounds.DeleteFile(mp3.Name())
 	if err != nil {
 		return nil
 	}

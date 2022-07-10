@@ -24,7 +24,7 @@ func (app *application) messageCreate(s *discordgo.Session, m *discordgo.Message
 
 	switch c.command {
 	case app.botCfg.CommandPrefix + "ping":
-		_, _ = s.ChannelMessageSend(m.ChannelID, "Pong :D "+mention)
+		_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Pong :D %v", mention))
 
 	case app.botCfg.CommandPrefix + "join":
 		if err := app.joinVoice(s, m); err != nil {

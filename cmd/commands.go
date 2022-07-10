@@ -86,7 +86,7 @@ func (app *application) clip(s *discordgo.Session, m *discordgo.MessageCreate, n
 		dur = duration
 	}
 
-	f, err := sounds.CreateDCAFile(url, start, dur)
+	f, aac, err := sounds.CreateDCAFile(url, start, dur)
 	if err != nil {
 		return err
 	}
@@ -99,6 +99,18 @@ func (app *application) clip(s *discordgo.Session, m *discordgo.MessageCreate, n
 	_, err = app.soundbiteModel.Insert(name, m.Author.Username, m.Author.ID, f.Name(), hash)
 	if err != nil {
 		return err
+	}
+
+	ms := &discordgo.MessageSend{
+		Content: fmt.Sprintf("Your clip is ready. Play it with **!play %v**", name),
+		Files: []*discordgo.File{createDiscordFile(name, aac)},
+	}
+
+	_,_ = s.ChannelMessageSendComplex(m.ChannelID, ms)
+
+	err = sounds.DeleteFile(aac.Name())
+	if err != nil {
+		return nil
 	}
 
 	return nil

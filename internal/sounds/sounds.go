@@ -65,7 +65,6 @@ func createAACFile(url, startTime string, duration int) (*os.File, error) {
 		kwargs["t"] = fmt.Sprint(duration)
 	}
 
-
 	err = ffmpeg.Input(videoFile.Name()).
 		Output(output, kwargs).OverWriteOutput().Run()
 
@@ -83,10 +82,10 @@ func createAACFile(url, startTime string, duration int) (*os.File, error) {
 	return audio, nil
 }
 
-func CreateDCAFile(url, startTime string, duration int) (*os.File, error) {
+func CreateDCAFile(url, startTime string, duration int) (*os.File, *os.File, error) {
 	aac, err := createAACFile(url, startTime, duration)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	c1 := exec.Command("ffmpeg", "-i", aac.Name(), "-f", "s16le", "-ar", "48000", "-ac", "2", "pipe:1")
@@ -94,13 +93,13 @@ func CreateDCAFile(url, startTime string, duration int) (*os.File, error) {
 
 	c2.Stdin, err = c1.StdoutPipe()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	fname := getFilename(aac.Name())
 	f, err := os.Create(fmt.Sprintf("./audio/%v.dca", fname))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer f.Close()
 
@@ -108,23 +107,18 @@ func CreateDCAFile(url, startTime string, duration int) (*os.File, error) {
 
 	err = c2.Start()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	err = c1.Run()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	err = c2.Wait()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	err = DeleteFile(aac.Name())
-	if err != nil {
-		return nil, err
-	}
-
-	return f, nil
+	return f, aac, nil
 }

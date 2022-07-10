@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/binary"
+	"fmt"
 	"io"
 	"os"
 	"strconv"
@@ -164,4 +165,11 @@ func getChannelID(s *discordgo.Session, m *discordgo.MessageCreate) string {
 	}
 
 	return ""
+}
+
+func createDiscordFile(name string, f *os.File) (*discordgo.File) {
+	return &discordgo.File{
+		Name: fmt.Sprintf("%v.mp3", name),
+		Reader: f,
+	}
 }

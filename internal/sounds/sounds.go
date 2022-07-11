@@ -126,6 +126,11 @@ func CreateDCAFile(url, startTime string, duration int) (*os.File, *os.File, err
 		return nil, nil, err
 	}
 
+	err = DeleteFile(aac.Name())
+	if err != nil {
+		return nil, nil, err
+	}
+
 	return f, mp3, nil
 }
 

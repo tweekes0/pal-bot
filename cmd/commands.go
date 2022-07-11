@@ -94,8 +94,6 @@ func (app *application) clip(s *discordgo.Session, m *discordgo.MessageCreate, n
 	}
 
 	_,_ = s.ChannelMessageSendComplex(m.ChannelID, ms)
-
-	app.infoLogger.Println(mp3.Name())
 	
 	err = sounds.DeleteFile(mp3.Name())
 	if err != nil {

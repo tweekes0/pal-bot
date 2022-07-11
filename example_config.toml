@@ -1,4 +1,18 @@
+# When deploying config should be renamed to "config.toml" and placed in root.
+
+# Token needed to connect to the Discord API
+# More info here: https://discord.com/developers/
 DiscordToken = "DISCORD_BOT_TOKEN"
+
+# The command prefix that the bot will respond to.
+# This should not be a '/'
 CommandPrefix = "!"
-BotChannelID = "BOT_CHANNEL_ID"
+
+# The channel where the bot will receive commands.
+# To find a channel ID read here: https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-
+BotChannelID = "BOT_CHANNEL_ID"0
+
+# DSN has to be for github.com/go-sql-driver
+# Example username:password@protocol(address)/dbname?param=value
+# More can be found here: https://github.com/go-sql-driver/mysql/#dsn-data-source-name
 DBConnectionString = "DATABASE DSN"

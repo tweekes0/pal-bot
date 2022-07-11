@@ -3,3 +3,5 @@ playground/
 .air.toml
 tmp/
 audio
+*.sql
+*.sh

@@ -42,7 +42,8 @@ func main() {
 		errLog.Fatalln(err)
 	}
 
-	db, err := openDB(cfg.DBConnectionString)
+	dsn := config.GetDSN()
+	db, err := openDB(dsn)
 	if err != nil {
 		errLog.Fatalln(err)
 	}

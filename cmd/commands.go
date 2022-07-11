@@ -53,7 +53,7 @@ func (app *application) playSound(s *discordgo.Session, m *discordgo.MessageCrea
 		return err
 	}
 
-	buf, err := loadSound(soundbite.FilePath)
+	buf, err := sounds.LoadSound(soundbite.FilePath)
 	if err != nil {
 		return err
 	}

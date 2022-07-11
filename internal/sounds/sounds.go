@@ -1,6 +1,7 @@
 package sounds
 
 import (
+	"encoding/binary"
 	"fmt"
 	"io"
 	"os"
@@ -150,4 +151,39 @@ func createMP3File(aac *os.File) (*os.File, error) {
 	}
 
 	return mp3, nil
+}
+
+// Will load an DCA file into an 2d byte slice to then be played via an opus connection
+func LoadSound(filepath string) ([][]byte, error) {
+	b := make([][]byte, 0)
+	file, err := os.Open(filepath)
+	if err != nil {
+		return nil, err
+	}
+
+	var opusLen int16
+
+	for {
+		err = binary.Read(file, binary.LittleEndian, &opusLen)
+		if err == io.EOF || err == io.ErrUnexpectedEOF {
+			err = file.Close()
+			if err != nil {
+				return nil, err
+			}
+
+			return b, nil
+		}
+
+		if err != nil {
+			return nil, err
+		}
+
+		inBuf := make([]byte, opusLen)
+		err = binary.Read(file, binary.LittleEndian, &inBuf)
+		if err != nil {
+			return nil, err
+		}
+
+		b = append(b, inBuf)
+	}
 }

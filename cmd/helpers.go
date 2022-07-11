@@ -2,9 +2,7 @@ package main
 
 import (
 	"database/sql"
-	"encoding/binary"
 	"fmt"
-	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -12,7 +10,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 	_ "github.com/go-sql-driver/mysql"
 )
-
 
 // Struct to structure command received from *discordgo.Message.Content
 type botCommand struct {
@@ -72,41 +69,6 @@ func getBotID(bot *discordgo.Session) (string, error) {
 	}
 
 	return u.ID, nil
-}
-
-// Will load an DCA file into an 2d byte slice to then be played via opus connection
-func loadSound(filepath string) ([][]byte, error) {
-	b := make([][]byte, 0)
-	file, err := os.Open(filepath)
-	if err != nil {
-		return nil, err
-	}
-
-	var opusLen int16
-
-	for {
-		err = binary.Read(file, binary.LittleEndian, &opusLen)
-		if err == io.EOF || err == io.ErrUnexpectedEOF {
-			err = file.Close()
-			if err != nil {
-				return nil, err
-			}
-
-			return b, nil
-		}
-
-		if err != nil {
-			return nil, err
-		}
-
-		inBuf := make([]byte, opusLen)
-		err = binary.Read(file, binary.LittleEndian, &inBuf)
-		if err != nil {
-			return nil, err
-		}
-
-		b = append(b, inBuf)
-	}
 }
 
 // Will make a connection to a mysql db with a given DSN

@@ -7,6 +7,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+// Handler for when the bot receives a command
 func (app *application) messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	mention := fmt.Sprintf("<@%v>", m.Author.ID)
 
@@ -81,6 +82,7 @@ func (app *application) messageCreate(s *discordgo.Session, m *discordgo.Message
 	}
 }
 
+// Handler for when the bot joins or leaves a voice channel
 func (app *application) voiceStateChange(s *discordgo.Session, vs *discordgo.VoiceStateUpdate) {
 	if vs.VoiceState.UserID == app.botID {
 		app.isSpeaking = false

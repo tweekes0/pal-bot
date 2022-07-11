@@ -125,6 +125,7 @@ func (app *application) deleteSound(s *discordgo.Session, m *discordgo.MessageCr
 	return nil
 }
 
+// Bot will show all the sounds that available.
 func (app *application) showSounds(s *discordgo.Session, m *discordgo.MessageCreate) error {
 	sounds, err := app.soundbiteModel.GetAll()
 	if err != nil {

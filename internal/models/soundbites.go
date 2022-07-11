@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// Struct to present a record in the 'soundbites' table
 type Soundbite struct {
 	ID       int
 	Name     string
@@ -16,11 +17,12 @@ type Soundbite struct {
 	Created  time.Time
 }
 
+// Struct that holds the database connectivity
 type SoundbiteModel struct {
 	DB *sql.DB
 }
 
-// Insert Soundbite's metadata into the 'soundbites' table
+// Insert Soundbites metadata into the 'soundbites' table
 func (m *SoundbiteModel) Insert(name, username, uid, filepath, filehash string) (int, error) {
 	stmt := `INSERT INTO soundbites (name, username, user_id, filepath, filehash, created)  
 	VALUES(?, ?, ?, ?, ?, UTC_TIMESTAMP())`
@@ -38,7 +40,7 @@ func (m *SoundbiteModel) Insert(name, username, uid, filepath, filehash string) 
 	return int(id), nil
 }
 
-// Gets Soundbite based on the name command
+// Gets a Soundbite based on the name command
 func (m *SoundbiteModel) Get(name string) (*Soundbite, error) {
 	stmt := `SELECT id, name, username, user_id, filepath, filehash, created FROM soundbites
 	WHERE name = ?`
@@ -58,7 +60,7 @@ func (m *SoundbiteModel) Get(name string) (*Soundbite, error) {
 	return s, nil
 }
 
-// Get all the soundbites in the soundbites table
+// Get all the soundbites in the 'soundbites' table
 func (m *SoundbiteModel) GetAll() ([]*Soundbite, error) {
 	stmt := `SELECT * FROM soundbites`
 
@@ -87,7 +89,7 @@ func (m *SoundbiteModel) GetAll() ([]*Soundbite, error) {
 	return soundbites, nil
 }
 
-// Check whether a soundbite exists based on the name of the command and the filehash
+// Check whether a soundbite exists based on the name of the command it's filehash filehash
 func (m *SoundbiteModel) Exists(name, hash string) (bool, error) {
 	var exists bool
 

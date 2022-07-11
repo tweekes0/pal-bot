@@ -27,7 +27,7 @@ func main() {
 	errLog := log.New(os.Stderr, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
 	infoLog := log.New(os.Stdin, "INFO: ", log.Ldate|log.Ltime)
 
-	cfg, err := config.ReadConfig()
+	cfg, err := config.ReadConfig("./config.toml")
 	if err != nil {
 		errLog.Fatalln(err)
 	}

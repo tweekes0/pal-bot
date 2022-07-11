@@ -5,51 +5,48 @@ import (
 	"io"
 	"os"
 	"os/exec"
-	"time"
 
 	"github.com/kkdai/youtube/v2"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 )
 
-func downloadYoutubeVideo(url string) (*os.File, time.Duration, error) {
+// Downloads a youtube video and returns an mp4 file if the download is succesful.
+func downloadYoutubeVideo(url string) (*os.File, error) {
 	client := &youtube.Client{}
 	video, err := client.GetVideo(url)
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 
 	format := video.Formats.WithAudioChannels()
 	stream, _, err := client.GetStream(video, &format[0])
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 
 	file, err := os.CreateTemp("", "*.mp4")
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 	defer file.Close()
 
 	_, err = io.Copy(file, stream)
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 
-	return file, 0, nil
+	return file, nil
 }
 
+// Converts an mp4 file to a AAC file.
 func createAACFile(url, startTime string, duration int) (*os.File, error) {
-	videoFile, vidDuration, err := downloadYoutubeVideo(url)
+	videoFile, err := downloadYoutubeVideo(url)
 	if err != nil {
 		return nil, err
 	}
 
-	if startTime == "" && vidDuration > (10*time.Second) {
-		return nil, ErrTooLong
-	}
-
-	if duration > 10 {
-		return nil, ErrTooLong
+	if duration > 10 || duration < 1 {
+		return nil, ErrInvalidDuration
 	}
 
 	if startTime == "" {
@@ -83,6 +80,9 @@ func createAACFile(url, startTime string, duration int) (*os.File, error) {
 	return audio, nil
 }
 
+
+// Converts and AAC file to a DCA file, file that can be streamed to discord VoiceChannel.
+// Returns a the DCA file and an MP3 file that is needed to be sent as an embed to a TextChannel.
 func CreateDCAFile(url, startTime string, duration int) (*os.File, *os.File, error) {
 	aac, err := createAACFile(url, startTime, duration)
 	if err != nil {
@@ -134,6 +134,7 @@ func CreateDCAFile(url, startTime string, duration int) (*os.File, *os.File, err
 	return f, mp3, nil
 }
 
+// Convert an AAC file into a MP3 using FFMPEG
 func createMP3File(aac *os.File) (*os.File, error) {
 	mp3, err := os.CreateTemp("", "*.mp3")
 	if err != nil {

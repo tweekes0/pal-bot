@@ -5,5 +5,5 @@ import (
 )
 
 var (
-	ErrTooLong = errors.New("clip would be too long")
+	ErrInvalidDuration = errors.New("duration is not valid")
 )

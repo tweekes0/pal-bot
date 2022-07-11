@@ -13,13 +13,16 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+
+// Struct to structure command received from *discordgo.Message.Content
 type botCommand struct {
 	command string
 	args    []string
 }
 
-func parseCommand(str string) *botCommand {
-	s := strings.Fields(str)
+// Parses the specific command and any arguments that it may have 
+func parseCommand(command string) *botCommand {
+	s := strings.Fields(command)
 
 	if len(s) == 0 {
 		return nil
@@ -42,6 +45,7 @@ func parseCommand(str string) *botCommand {
 	return c
 }
 
+// Creates a session to the discord API with a discord token.
 func initializeBot(token string) (*discordgo.Session, error) {
 	bot, err := discordgo.New("Bot " + token)
 	if err != nil {
@@ -60,6 +64,7 @@ func initializeBot(token string) (*discordgo.Session, error) {
 	return bot, nil
 }
 
+// Gets the bot's ID, needed so the bot won't respond to itself.
 func getBotID(bot *discordgo.Session) (string, error) {
 	u, err := bot.User("@me")
 	if err != nil {
@@ -69,6 +74,7 @@ func getBotID(bot *discordgo.Session) (string, error) {
 	return u.ID, nil
 }
 
+// Will load an DCA file into an 2d byte slice to then be played via opus connection
 func loadSound(filepath string) ([][]byte, error) {
 	b := make([][]byte, 0)
 	file, err := os.Open(filepath)
@@ -103,6 +109,7 @@ func loadSound(filepath string) ([][]byte, error) {
 	}
 }
 
+// Will make a connection to a mysql db with a given DSN
 func openDB(dsn string) (*sql.DB, error) {
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
@@ -116,6 +123,7 @@ func openDB(dsn string) (*sql.DB, error) {
 	return db, nil
 }
 
+// Struct to structure arguments for 'clip' command
 type clipArgs struct {
 	Name     string
 	Url      string
@@ -123,6 +131,7 @@ type clipArgs struct {
 	Duration int
 }
 
+// Will parse the args from the 'clip' command and return a *clipArgs struct. 
 func parseClipCommand(args []string) (*clipArgs, error) {
 	var err error
 
@@ -155,6 +164,8 @@ func parseClipCommand(args []string) (*clipArgs, error) {
 	return c, nil
 }
 
+// Gets the VoiceChannel of the user who sends a command, 
+// will return nothing if the user is not in voice.
 func getChannelID(s *discordgo.Session, m *discordgo.MessageCreate) string {
 	for _, guild := range s.State.Guilds {
 		for _, vs := range guild.VoiceStates {
@@ -167,6 +178,7 @@ func getChannelID(s *discordgo.Session, m *discordgo.MessageCreate) string {
 	return ""
 }
 
+// Gets the startTime for a clip and its duration.
 func getRuntime(start string, duration int) (startTime string, dur int) {
 	switch {
 	case start == "":
@@ -183,10 +195,11 @@ func getRuntime(start string, duration int) (startTime string, dur int) {
 	return
 }
 
+// Take a name and *os.File and transforms it into a discordgo.File
+// needed for sending files to discord channel.
 func createDiscordFile(name string, f *os.File) (*discordgo.File) {
 	return &discordgo.File{
 		Name: fmt.Sprintf("%v.mp3", name),
 		Reader: f,
 	}
 }
-

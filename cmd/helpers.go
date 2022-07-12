@@ -165,3 +165,15 @@ func createDiscordFile(name string, f *os.File) (*discordgo.File) {
 		Reader: f,
 	}
 }
+
+// Function that will create necessary folders.
+func createFolder(path string) error {
+	_, err := os.Stat(path) 
+	if os.IsNotExist(err) {
+		if err = os.Mkdir(path, os.ModePerm); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}

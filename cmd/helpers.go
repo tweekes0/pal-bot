@@ -8,7 +8,8 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/mattn/go-sqlite3"
+	"github.com/tweekes0/pal-bot/internal/config"
 )
 
 // Struct to structure command received from *discordgo.Message.Content
@@ -17,7 +18,7 @@ type botCommand struct {
 	args    []string
 }
 
-// Parses the specific command and any arguments that it may have 
+// Parses the specific command and any arguments that it may have
 func parseCommand(command string) *botCommand {
 	s := strings.Fields(command)
 
@@ -51,7 +52,7 @@ func initializeBot(token string) (*discordgo.Session, error) {
 
 	bot.StateEnabled = true
 	bot.State.TrackVoice = true
-	bot.Identify.Intents = discordgo.IntentsGuilds | discordgo.IntentsGuildMessages | discordgo.IntentsGuildVoiceStates 
+	bot.Identify.Intents = discordgo.IntentsGuilds | discordgo.IntentsGuildMessages | discordgo.IntentsGuildVoiceStates
 
 	err = bot.Open()
 	if err != nil {
@@ -71,9 +72,9 @@ func getBotID(bot *discordgo.Session) (string, error) {
 	return u.ID, nil
 }
 
-// Will make a connection to a mysql db with a given DSN
-func openDB(dsn string) (*sql.DB, error) {
-	db, err := sql.Open("mysql", dsn)
+// Will make a connection to a sqlite3 db with a given filepath
+func openDB(filepath string) (*sql.DB, error) {
+	db, err := sql.Open(config.DB_DRIVER, filepath)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +94,7 @@ type clipArgs struct {
 	Duration int
 }
 
-// Will parse the args from the 'clip' command and return a *clipArgs struct. 
+// Will parse the args from the 'clip' command and return a *clipArgs struct.
 func parseClipCommand(args []string) (*clipArgs, error) {
 	var err error
 
@@ -109,7 +110,7 @@ func parseClipCommand(args []string) (*clipArgs, error) {
 		c.Duration = 10
 	case 3:
 		c.Name = args[0]
-		c.Url= args[1]
+		c.Url = args[1]
 		c.Start = args[2]
 		c.Duration = 10
 	case 4:
@@ -126,7 +127,7 @@ func parseClipCommand(args []string) (*clipArgs, error) {
 	return c, nil
 }
 
-// Gets the VoiceChannel of the user who sends a command, 
+// Gets the VoiceChannel of the user who sends a command,
 // will return nothing if the user is not in voice.
 func getChannelID(s *discordgo.Session, m *discordgo.MessageCreate) string {
 	for _, guild := range s.State.Guilds {
@@ -159,16 +160,16 @@ func getRuntime(start string, duration int) (startTime string, dur int) {
 
 // Take a name and *os.File and transforms it into a discordgo.File
 // needed for sending files to discord channel.
-func createDiscordFile(name string, f *os.File) (*discordgo.File) {
+func createDiscordFile(name string, f *os.File) *discordgo.File {
 	return &discordgo.File{
-		Name: fmt.Sprintf("%v.mp3", name),
+		Name:   fmt.Sprintf("%v.mp3", name),
 		Reader: f,
 	}
 }
 
-// Function that will create necessary folders.
+// Creates folders.
 func createFolder(path string) error {
-	_, err := os.Stat(path) 
+	_, err := os.Stat(path)
 	if os.IsNotExist(err) {
 		if err = os.Mkdir(path, os.ModePerm); err != nil {
 			return err

@@ -6,6 +6,10 @@ import (
 	"time"
 )
 
+const (
+	TIME_LAYOUT = "2006-01-02 15:04:05"
+)
+
 // Struct to present a record in the 'soundbites' table
 type Soundbite struct {
 	ID       int
@@ -22,10 +26,30 @@ type SoundbiteModel struct {
 	DB *sql.DB
 }
 
+// Initialize the 'soundbites' table in the sqlite db
+func (m *SoundbiteModel) Initialize() error {
+	stmt := `CREATE TABLE IF NOT EXISTS soundbites (
+		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+		name TEXT NOT NULL,
+		username TEXT NOT NULL,
+		user_id	TEXT NOT NULL,
+		filepath TEXT NOT NULL,
+		filehash TEXT NOT NULL,
+		created TEXT NOT NULL,
+		UNIQUE(name)
+	);`
+
+	if _, err := m.DB.Exec(stmt); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Insert Soundbites metadata into the 'soundbites' table
 func (m *SoundbiteModel) Insert(name, username, uid, filepath, filehash string) (int, error) {
 	stmt := `INSERT INTO soundbites (name, username, user_id, filepath, filehash, created)  
-	VALUES(?, ?, ?, ?, ?, UTC_TIMESTAMP())`
+	VALUES(?, ?, ?, ?, ?, datetime('now'));`
 
 	res, err := m.DB.Exec(stmt, name, username, uid, filepath, filehash)
 	if err != nil {
@@ -42,13 +66,13 @@ func (m *SoundbiteModel) Insert(name, username, uid, filepath, filehash string) 
 
 // Gets a Soundbite based on the name command
 func (m *SoundbiteModel) Get(name string) (*Soundbite, error) {
-	stmt := `SELECT id, name, username, user_id, filepath, filehash, created FROM soundbites
-	WHERE name = ?`
-
+	stmt := `SELECT * FROM soundbites WHERE name = ?`
 	row := m.DB.QueryRow(stmt, name)
 
+	var date string
 	s := &Soundbite{}
-	err := row.Scan(&s.ID, &s.Name, &s.Username, &s.UserID, &s.FilePath, &s.FileHash, &s.Created)
+
+	err := row.Scan(&s.ID, &s.Name, &s.Username, &s.UserID, &s.FilePath, &s.FileHash, &date)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNoRecords
@@ -57,6 +81,12 @@ func (m *SoundbiteModel) Get(name string) (*Soundbite, error) {
 		return nil, err
 	}
 
+	t, err := time.Parse(TIME_LAYOUT, date)
+	if err != nil {
+		return nil, err
+	}
+
+	s.Created = t
 	return s, nil
 }
 
@@ -73,12 +103,20 @@ func (m *SoundbiteModel) GetAll() ([]*Soundbite, error) {
 	soundbites := []*Soundbite{}
 
 	for rows.Next() {
+		var date string
 		s := &Soundbite{}
-		err = rows.Scan(&s.ID, &s.Name, &s.Username, &s.UserID, &s.FilePath, &s.FileHash, &s.Created)
+
+		err = rows.Scan(&s.ID, &s.Name, &s.Username, &s.UserID, &s.FilePath, &s.FileHash, &date)
 		if err != nil {
 			return nil, err
 		}
 
+		t, err := time.Parse(TIME_LAYOUT, date)
+		if err != nil {
+			return nil, err
+		}
+
+		s.Created = t
 		soundbites = append(soundbites, s)
 	}
 
@@ -93,7 +131,7 @@ func (m *SoundbiteModel) GetAll() ([]*Soundbite, error) {
 func (m *SoundbiteModel) Exists(name, hash string) (bool, error) {
 	var exists bool
 
-	stmt := `SELECT EXISTS(SELECT true FROM soundbites WHERE name = ? OR filehash = ?)`
+	stmt := `SELECT EXISTS(SELECT 1 FROM soundbites WHERE name = ? OR filehash = ?)`
 	err := m.DB.QueryRow(stmt, name, hash).Scan(&exists)
 
 	return exists, err
@@ -127,7 +165,7 @@ func (m *SoundbiteModel) Delete(name, uid string) error {
 // Checks that the user_id of the soundbite belongs to the user requesting the delete
 func (m *SoundbiteModel) userCreatedCommand(name, uid string) error {
 	var exists bool
-	stmt := `SELECT EXISTS(SELECT true FROM soundbites where name = ? AND user_id = ?)`
+	stmt := `SELECT EXISTS(SELECT 1 FROM soundbites where name = ? AND user_id = ?)`
 
 	err := m.DB.QueryRow(stmt, name, uid).Scan(&exists)
 	if err != nil {

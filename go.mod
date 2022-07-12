@@ -7,6 +7,7 @@ require (
 	github.com/bwmarrin/discordgo v0.25.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/kkdai/youtube/v2 v2.7.15
+	github.com/mattn/go-sqlite3 v1.14.14
 	github.com/u2takey/ffmpeg-go v0.4.1
 )
 

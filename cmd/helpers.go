@@ -72,7 +72,7 @@ func getBotID(bot *discordgo.Session) (string, error) {
 	return u.ID, nil
 }
 
-// Will make a connection to a sqlite3 db with a given filepath
+// Will make a connection to a sqlite db with a given filepath
 func openDB(filepath string) (*sql.DB, error) {
 	db, err := sql.Open(config.DB_DRIVER, filepath)
 	if err != nil {

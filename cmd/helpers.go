@@ -9,7 +9,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/tweekes0/pal-bot/internal/config"
+	"github.com/tweekes0/pal-bot/config"
 )
 
 // Struct to structure command received from *discordgo.Message.Content

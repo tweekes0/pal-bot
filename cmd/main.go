@@ -7,13 +7,13 @@ import (
 	"path/filepath"
 	"syscall"
 
-	"github.com/tweekes0/pal-bot/internal/config"
+	"github.com/tweekes0/pal-bot/config"
 	"github.com/tweekes0/pal-bot/internal/models"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-// Struct that holds the bot's loggers and state necessary 
+// Struct that holds the bot's loggers and state necessary
 // to control the bot
 type application struct {
 	botID          string

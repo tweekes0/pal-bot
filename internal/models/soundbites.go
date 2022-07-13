@@ -66,7 +66,7 @@ func (m *SoundbiteModel) Insert(name, username, uid, filepath, filehash string) 
 
 // Gets a Soundbite based on the name command
 func (m *SoundbiteModel) Get(name string) (*Soundbite, error) {
-	stmt := `SELECT * FROM soundbites WHERE name = ?`
+	stmt := `SELECT * FROM soundbites WHERE name = ?;`
 	row := m.DB.QueryRow(stmt, name)
 
 	var date string
@@ -92,7 +92,7 @@ func (m *SoundbiteModel) Get(name string) (*Soundbite, error) {
 
 // Get all the soundbites in the 'soundbites' table
 func (m *SoundbiteModel) GetAll() ([]*Soundbite, error) {
-	stmt := `SELECT * FROM soundbites`
+	stmt := `SELECT * FROM soundbites;`
 
 	rows, err := m.DB.Query(stmt)
 	if err != nil {
@@ -131,7 +131,7 @@ func (m *SoundbiteModel) GetAll() ([]*Soundbite, error) {
 func (m *SoundbiteModel) Exists(name, hash string) (bool, error) {
 	var exists bool
 
-	stmt := `SELECT EXISTS(SELECT 1 FROM soundbites WHERE name = ? OR filehash = ?)`
+	stmt := `SELECT EXISTS(SELECT 1 FROM soundbites WHERE name = ? OR filehash = ?);`
 	err := m.DB.QueryRow(stmt, name, hash).Scan(&exists)
 
 	return exists, err
@@ -143,7 +143,7 @@ func (m *SoundbiteModel) Delete(name, uid string) error {
 		return err
 	}
 
-	stmt := `DELETE FROM soundbites WHERE name = ? AND user_id = ? LIMIT 1`
+	stmt := `DELETE FROM soundbites WHERE name = ? AND user_id = ?;`
 
 	res, err := m.DB.Exec(stmt, name, uid)
 	if err != nil {
@@ -165,7 +165,7 @@ func (m *SoundbiteModel) Delete(name, uid string) error {
 // Checks that the user_id of the soundbite belongs to the user requesting the delete
 func (m *SoundbiteModel) userCreatedCommand(name, uid string) error {
 	var exists bool
-	stmt := `SELECT EXISTS(SELECT 1 FROM soundbites where name = ? AND user_id = ?)`
+	stmt := `SELECT EXISTS(SELECT 1 FROM soundbites where name = ? AND user_id = ?);`
 
 	err := m.DB.QueryRow(stmt, name, uid).Scan(&exists)
 	if err != nil {

@@ -37,6 +37,7 @@ func main() {
 	if err != nil {
 		errLog.Fatalln(err)
 	}
+	defer db.Close()
 
 	// Create a struct from a config file
 	cfg, err := config.ReadConfig()

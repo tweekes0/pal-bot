@@ -31,18 +31,6 @@ func main() {
 	errLog := log.New(os.Stderr, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
 	infoLog := log.New(os.Stdin, "INFO: ", log.Ldate|log.Ltime)
 
-	// Create audio folder 
-	err := createFolder("./audio")
-	if err != nil {
-		errLog.Println(err)
-	}
-
-	// Create database folder
-	err = createFolder("./db")
-	if err != nil {
-		errLog.Println(err)
-	}
-
 	// Create filepath and db connectivity
 	path := filepath.Join(config.DB_DIR, config.DB_FILENAME)
 	db, err := openDB(path)

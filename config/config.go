@@ -10,7 +10,8 @@ const (
 	CONFIG_FILE = "./config.toml"
 	DB_DRIVER   = "sqlite"
 	DB_FILENAME = "pal-bot.db"
-	DB_DIR      = "./db"
+	DB_DIR      = "./data/db"
+	AUDIO_DIR   = "./data/audio"
 )
 
 // Struct for all the config elements found in 'config.toml'

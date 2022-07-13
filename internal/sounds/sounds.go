@@ -7,6 +7,8 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/tweekes0/pal-bot/config"
+
 	"github.com/kkdai/youtube/v2"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 )
@@ -55,8 +57,8 @@ func createAACFile(url, startTime string, duration int) (*os.File, error) {
 		duration = 10
 	}
 
-	name := getFilename(videoFile.Name())
-	output := fmt.Sprintf("./audio/%v.aac", name)
+	fname := getFilename(videoFile.Name())
+	output := fmt.Sprintf("%v/%v.aac", config.AUDIO_DIR, fname)
 	kwargs := ffmpeg.KwArgs{"ss": startTime, "vn": "", "acodec": "copy"}
 
 	if duration != 0 {
@@ -81,7 +83,6 @@ func createAACFile(url, startTime string, duration int) (*os.File, error) {
 	return audio, nil
 }
 
-
 // Converts and AAC file to a DCA file, file that can be streamed to discord VoiceChannel.
 // Returns a the DCA file and an MP3 file that is needed to be sent as an embed to a TextChannel.
 func CreateDCAFile(url, startTime string, duration int) (*os.File, *os.File, error) {
@@ -99,7 +100,7 @@ func CreateDCAFile(url, startTime string, duration int) (*os.File, *os.File, err
 	}
 
 	fname := getFilename(aac.Name())
-	f, err := os.Create(fmt.Sprintf("./audio/%v.dca", fname))
+	f, err := os.Create(fmt.Sprintf("%v/%v.dca", config.AUDIO_DIR, fname))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -145,7 +146,7 @@ func createMP3File(aac *os.File) (*os.File, error) {
 	kwargs := ffmpeg.KwArgs{"acodec": "libmp3lame"}
 	err = ffmpeg.Input(aac.Name()).
 		Output(mp3.Name(), kwargs).OverWriteOutput().Run()
-	
+
 	if err != nil {
 		return nil, err
 	}

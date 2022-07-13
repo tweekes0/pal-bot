@@ -8,10 +8,10 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 	"github.com/tweekes0/pal-bot/config"
 )
-
+//
 // Struct to structure command received from *discordgo.Message.Content
 type botCommand struct {
 	command string

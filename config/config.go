@@ -8,7 +8,7 @@ import (
 
 const (
 	CONFIG_FILE = "./config.toml"
-	DB_DRIVER   = "sqlite3"
+	DB_DRIVER   = "sqlite"
 	DB_FILENAME = "pal-bot.db"
 	DB_DIR      = "./db"
 )

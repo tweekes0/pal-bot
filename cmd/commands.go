@@ -64,32 +64,25 @@ func (app *application) leaveCommand(s *discordgo.Session, m *discordgo.MessageC
 
 // Bot will load an audio file from disc and play it in the voice channel specified in config file
 func (app *application) playSound(s *discordgo.Session, m *discordgo.MessageCreate, name string) error {
+	if sound, ok := app.soundbiteCache[name]; ok {
+		if err := app.streamSoundBite(s, m, sound); err != nil {
+			return err
+		}
+
+		return nil
+	}
+
 	soundbite, err := app.soundbiteModel.Get(name)
 	if err != nil {
 		return err
 	}
+	app.soundbiteCache[name] = soundbite
 
-	if err := app.joinVoice(s, m); err != nil {
+
+	if err := app.streamSoundBite(s, m, soundbite); err != nil {
 		return err
 	}
 
-	if app.isSpeaking {
-		return nil
-	}
-
-	buf, err := sounds.LoadSound(soundbite.FilePath)
-	if err != nil {
-		return err
-	}
-
-	app.vc.Speaking(true)
-	app.isSpeaking = true
-	for _, b := range buf {
-		app.vc.OpusSend <- b
-	}
-
-	app.vc.Speaking(false)
-	app.isSpeaking = false
 	return nil
 }
 
@@ -165,6 +158,9 @@ func (app *application) deleteSound(s *discordgo.Session, m *discordgo.MessageCr
 	if err != nil {
 		return err
 	}
+
+	// remove item from cache if it is there.
+	delete(app.soundbiteCache, name)
 
 	err = app.soundbiteModel.Delete(name, m.Author.ID)
 	if err != nil {

@@ -24,6 +24,7 @@ type application struct {
 	soundbiteModel *models.SoundbiteModel
 	joinedVoice    bool
 	isSpeaking     bool
+	soundbiteCache    map[string]*models.Soundbite
 }
 
 func main() {
@@ -61,8 +62,8 @@ func main() {
 	bot, err := initializeBot(cfg.DiscordToken)
 	if err != nil {
 		errLog.Fatalln(err)
-	}	
-	
+	}
+
 	// Gets the discord bot id
 	botID, err := getBotID(bot)
 	if err != nil {
@@ -78,8 +79,16 @@ func main() {
 		infoLogger:     infoLog,
 		soundbiteModel: &models.SoundbiteModel{DB: db},
 	}
-	
+
 	app.soundbiteModel.Initialize()
+
+	// Create a cache of all the soundbites in the db
+	soundbiteCache, err := app.createSoundsCache()
+	if err != nil {
+		errLog.Fatalln(err)
+	}
+
+	app.soundbiteCache = soundbiteCache
 
 	bot.AddHandler(app.messageCreate)
 	bot.AddHandler(app.voiceStateChange)

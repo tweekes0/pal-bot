@@ -9,6 +9,8 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/tweekes0/pal-bot/config"
+	"github.com/tweekes0/pal-bot/internal/models"
+	"github.com/tweekes0/pal-bot/internal/sounds"
 	_ "modernc.org/sqlite"
 )
 
@@ -179,7 +181,7 @@ func createFolder(path string) error {
 	return nil
 }
 
-// Returns a map of type 'Commands'
+// Returns a map of all 'Commands'
 func (app *application) getCommands(s *discordgo.Session, m *discordgo.MessageCreate, prefix string) Commands {
 	c := make(Commands)
 	c[fmt.Sprint(prefix, "ping")] = app.pingCommand(s, m)
@@ -191,4 +193,45 @@ func (app *application) getCommands(s *discordgo.Session, m *discordgo.MessageCr
 	c[fmt.Sprint(prefix, "sounds")] = app.soundsCommand(s, m)
 
 	return c
+}
+
+// Create a map for a cache of soundbites
+func (app *application) createSoundsCache() (map[string]*models.Soundbite, error) {
+	sounds, err := app.soundbiteModel.GetAll()
+	if err != nil {
+		return nil, err
+	}
+
+	cache := make(map[string]*models.Soundbite)
+	for _, sound := range sounds {
+		cache[sound.Name] = sound
+	}
+
+	return cache, nil
+}
+
+// Load and stream a soundbite into a VoiceChannel.
+func (app *application) streamSoundBite(s *discordgo.Session, m *discordgo.MessageCreate, soundbite *models.Soundbite) error {
+	if err := app.joinVoice(s, m); err != nil {
+		return err
+	}
+
+	if app.isSpeaking {
+		return nil
+	}
+
+	buf, err := sounds.LoadSound(soundbite.FilePath)
+	if err != nil {
+		return err
+	}
+
+	app.vc.Speaking(true)
+	app.isSpeaking = true
+	for _, b := range buf {
+		app.vc.OpusSend <- b
+	}
+
+	app.vc.Speaking(false)
+	app.isSpeaking = false
+	return nil
 }

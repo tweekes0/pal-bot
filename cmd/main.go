@@ -83,6 +83,7 @@ func main() {
 
 	bot.AddHandler(app.messageCreate)
 	bot.AddHandler(app.voiceStateChange)
+	bot.AddHandler(app.guildJoin)
 
 	infoLog.Println("Bot is now running. Press CTRL-C to exit")
 

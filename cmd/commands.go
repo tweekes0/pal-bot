@@ -40,17 +40,17 @@ func (app *application) leaveVoice() error {
 
 // Bot will load an audio file from disc and play it in the voice channel specified in config file
 func (app *application) playSound(s *discordgo.Session, m *discordgo.MessageCreate, name string) error {
+	soundbite, err := app.soundbiteModel.Get(name)
+	if err != nil {
+		return err
+	}
+
 	if err := app.joinVoice(s, m); err != nil {
 		return err
 	}
 
 	if app.isSpeaking {
 		return nil
-	}
-
-	soundbite, err := app.soundbiteModel.Get(name)
-	if err != nil {
-		return err
 	}
 
 	buf, err := sounds.LoadSound(soundbite.FilePath)

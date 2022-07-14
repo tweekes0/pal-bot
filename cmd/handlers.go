@@ -39,6 +39,7 @@ func (app *application) messageCreate(s *discordgo.Session, m *discordgo.Message
 
 	case app.botCfg.CommandPrefix + "play":
 		if len(c.args) < 1 {
+			// TODO: send message to user on how to use command
 			return
 		}
 
@@ -93,4 +94,9 @@ func (app *application) voiceStateChange(s *discordgo.Session, vs *discordgo.Voi
 			app.joinedVoice = true
 		}
 	}
+}
+
+func (app *application) guildJoin(s *discordgo.Session, g *discordgo.GuildCreate) {
+	msg := "Hi @everyone, I am Pal Bot"
+	_, _ = s.ChannelMessageSend(app.botCfg.BotChannelID, msg)
 }

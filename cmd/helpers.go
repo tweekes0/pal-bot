@@ -11,7 +11,7 @@ import (
 	_ "modernc.org/sqlite"
 	"github.com/tweekes0/pal-bot/config"
 )
-//
+
 // Struct to structure command received from *discordgo.Message.Content
 type botCommand struct {
 	command string
@@ -165,4 +165,15 @@ func createDiscordFile(name string, f *os.File) *discordgo.File {
 		Name:   fmt.Sprintf("%v.mp3", name),
 		Reader: f,
 	}
+}
+
+func createFolder(path string) error {
+	_, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		if err = os.Mkdir(path, os.ModePerm); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

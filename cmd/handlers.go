@@ -10,7 +10,7 @@ import (
 // Handler for when the bot receives a command
 func (app *application) messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	mention := fmt.Sprintf("<@%v>", m.Author.ID)
-	
+
 	if m.Author.ID == app.botID {
 		return
 	}
@@ -20,12 +20,15 @@ func (app *application) messageCreate(s *discordgo.Session, m *discordgo.Message
 		_, _ = s.ChannelMessageSend(app.botCfg.BotChannelID, msg)
 		return
 	}
+	
+	if app.commands == nil {
+		app.commands = app.getCommands(app.botCfg.CommandPrefix)
+	} 
 
-	commands := app.getCommands(s, m, app.botCfg.CommandPrefix)
 	c := parseCommand(m.Content)
 
-	if command, ok := commands[c.command]; ok {
-		err := command(c.args)
+	if command, ok := app.commands[c.command]; ok {
+		err := command.action(s, m, c.args)
 		if err != nil {
 			app.errorLogger.Println(err)
 		}

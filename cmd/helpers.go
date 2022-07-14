@@ -14,6 +14,18 @@ import (
 	_ "modernc.org/sqlite"
 )
 
+// Descriptions for commands
+const (
+	pingDesc   = "Pong :D"
+	joinDesc   = "Joins to the user's current VoiceChannel"
+	leaveDesc  = "Leaves the current VoiceChannel"
+	clipDesc   = "Create a youtube video and create a soundbite from it. **!help clip** for more"
+	playDesc   = "Play a sound that has been clipped"
+	deleteDesc = "Delete a clipped soundbite, the user created"
+	soundsDesc = "List all available sounds"
+	commandsDesc = "List all available commands"
+)
+
 // Struct to structure command received from *discordgo.Message.Content
 type botCommand struct {
 	command string
@@ -182,15 +194,16 @@ func createFolder(path string) error {
 }
 
 // Returns a map of all 'Commands'
-func (app *application) getCommands(s *discordgo.Session, m *discordgo.MessageCreate, prefix string) Commands {
+func (app *application) getCommands(prefix string) Commands{
 	c := make(Commands)
-	c[fmt.Sprint(prefix, "ping")] = app.pingCommand(s, m)
-	c[fmt.Sprint(prefix, "join")] = app.joinCommand(s, m)
-	c[fmt.Sprint(prefix, "leave")] = app.leaveCommand(s, m)
-	c[fmt.Sprint(prefix, "clip")] = app.clipCommand(s, m)
-	c[fmt.Sprint(prefix, "play")] = app.playCommand(s, m)
-	c[fmt.Sprint(prefix, "delete")] = app.deleteCommand(s, m)
-	c[fmt.Sprint(prefix, "sounds")] = app.soundsCommand(s, m)
+	c[fmt.Sprint(prefix, "ping")] = Command{pingDesc, app.pingCommand()}
+	c[fmt.Sprint(prefix, "join")] = Command{joinDesc, app.joinCommand()}
+	c[fmt.Sprint(prefix, "leave")] = Command{leaveDesc, app.leaveCommand()}
+	c[fmt.Sprint(prefix, "clip")] = Command{clipDesc, app.clipCommand()}
+	c[fmt.Sprint(prefix, "play")] = Command{playDesc, app.playCommand()}
+	c[fmt.Sprint(prefix, "delete")] = Command{deleteDesc, app.deleteCommand()}
+	c[fmt.Sprint(prefix, "sounds")] = Command{soundsDesc, app.soundsCommand()}
+	c[fmt.Sprint(prefix, "commands")] = Command{commandsDesc, app.commandsCommand()}
 
 	return c
 }

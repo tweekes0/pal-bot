@@ -24,7 +24,8 @@ type application struct {
 	soundbiteModel *models.SoundbiteModel
 	joinedVoice    bool
 	isSpeaking     bool
-	soundbiteCache    map[string]*models.Soundbite
+	soundbiteCache map[string]*models.Soundbite
+	commands Commands
 }
 
 func main() {

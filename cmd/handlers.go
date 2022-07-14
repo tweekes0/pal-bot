@@ -10,7 +10,7 @@ import (
 // Handler for when the bot receives a command
 func (app *application) messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	mention := fmt.Sprintf("<@%v>", m.Author.ID)
-
+	
 	if m.Author.ID == app.botID {
 		return
 	}
@@ -21,65 +21,14 @@ func (app *application) messageCreate(s *discordgo.Session, m *discordgo.Message
 		return
 	}
 
+	commands := app.getCommands(s, m, app.botCfg.CommandPrefix)
 	c := parseCommand(m.Content)
 
-	switch c.command {
-	case app.botCfg.CommandPrefix + "ping":
-		_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Pong :D %v", mention))
-
-	case app.botCfg.CommandPrefix + "join":
-		if err := app.joinVoice(s, m); err != nil {
-			app.errorLogger.Println(err)
-		}
-
-	case app.botCfg.CommandPrefix + "leave":
-		if err := app.leaveVoice(); err != nil {
-			app.errorLogger.Println(err)
-		}
-
-	case app.botCfg.CommandPrefix + "play":
-		if len(c.args) < 1 {
-			// TODO: send message to user on how to use command
-			return
-		}
-
-		name := c.args[0]
-		if err := app.playSound(s, m, name); err != nil {
-			app.errorLogger.Println(err)
-		}
-
-	case app.botCfg.CommandPrefix + "clip":
-		args, err := parseClipCommand(c.args)
+	if command, ok := commands[c.command]; ok {
+		err := command(c.args)
 		if err != nil {
 			app.errorLogger.Println(err)
-			return
 		}
-
-		err = app.clip(s, m, args.Name, args.Url, args.Start, args.Duration)
-		if err != nil {
-			app.errorLogger.Println(err)
-			return
-		}
-
-	case app.botCfg.CommandPrefix + "delete":
-		if len(c.args) < 1 {
-			return
-		}
-
-		name := c.args[0]
-		if err := app.deleteSound(s, m, name); err != nil {
-			app.errorLogger.Println(err)
-			return
-		}
-
-	case app.botCfg.CommandPrefix + "sounds":
-		if err := app.showSounds(s, m); err != nil {
-			app.errorLogger.Println(err)
-			return
-		}
-
-	default:
-		return
 	}
 }
 

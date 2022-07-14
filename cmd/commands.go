@@ -9,6 +9,8 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+type Commands map[string]func([]string) error
+
 // Bot will join the voice channel that is specified in config file
 func (app *application) joinVoice(s *discordgo.Session, m *discordgo.MessageCreate) error {
 	id := getChannelID(s, m)
@@ -25,8 +27,19 @@ func (app *application) joinVoice(s *discordgo.Session, m *discordgo.MessageCrea
 	return nil
 }
 
+// wrapper function for the 'join' command
+func (app *application) joinCommand(s *discordgo.Session, m *discordgo.MessageCreate) func([]string) error {
+	return func(st []string) error {
+		if err := app.joinVoice(s, m); err != nil {
+			return err
+		}
+
+		return nil
+	}
+}
+
 // Bot will leave the voice channel it is currently in
-func (app *application) leaveVoice() error {
+func (app *application) leaveVoice(s *discordgo.Session, m *discordgo.MessageCreate) error {
 	if !app.joinedVoice {
 		return ErrBotNotInVC
 	}
@@ -36,6 +49,17 @@ func (app *application) leaveVoice() error {
 	}
 
 	return nil
+}
+
+// wrapper function for the 'leave' command
+func (app *application) leaveCommand(s *discordgo.Session, m *discordgo.MessageCreate) func([]string) error {
+	return func([]string) error {
+		if err := app.leaveVoice(s, m); err != nil {
+			return err
+		}
+
+		return nil
+	}
 }
 
 // Bot will load an audio file from disc and play it in the voice channel specified in config file
@@ -69,6 +93,22 @@ func (app *application) playSound(s *discordgo.Session, m *discordgo.MessageCrea
 	return nil
 }
 
+// wrapper function for the 'play' command
+func (app *application) playCommand(s *discordgo.Session, m *discordgo.MessageCreate) func([]string) error {
+	return func(st []string) error {
+		if len(st) < 1 {
+			return ErrNotEnoughArgs
+		}
+
+		name := st[0]
+		if err := app.playSound(s, m, name); err != nil {
+			return err
+		}
+
+		return nil
+	}
+}
+
 // Bot will create audio file from youtube video
 func (app *application) clip(s *discordgo.Session, m *discordgo.MessageCreate, name, url, startTime string, duration int) error {
 	start, dur := getRuntime(startTime, duration)
@@ -90,11 +130,11 @@ func (app *application) clip(s *discordgo.Session, m *discordgo.MessageCreate, n
 
 	ms := &discordgo.MessageSend{
 		Content: fmt.Sprintf("Your clip is ready. Play it with **!play %v**", name),
-		Files: []*discordgo.File{createDiscordFile(name, mp3)},
+		Files:   []*discordgo.File{createDiscordFile(name, mp3)},
 	}
 
-	_,_ = s.ChannelMessageSendComplex(m.ChannelID, ms)
-	
+	_, _ = s.ChannelMessageSendComplex(m.ChannelID, ms)
+
 	err = sounds.DeleteFile(mp3.Name())
 	if err != nil {
 		return nil
@@ -103,7 +143,23 @@ func (app *application) clip(s *discordgo.Session, m *discordgo.MessageCreate, n
 	return nil
 }
 
-// Bot will delete the specified sound 
+// wrapper function for the 'clip' command
+func (app *application) clipCommand(s *discordgo.Session, m *discordgo.MessageCreate) func([]string) error {
+	return func(st []string) error {
+		args, err := parseClipCommand(st)
+		if err != nil {
+			return err
+		}
+
+		if err := app.clip(s, m, args.Name, args.Url, args.Start, args.Duration); err != nil {
+			return err
+		}
+
+		return nil
+	}
+}
+
+// Bot will delete the specified sound
 func (app *application) deleteSound(s *discordgo.Session, m *discordgo.MessageCreate, name string) error {
 	sound, err := app.soundbiteModel.Get(name)
 	if err != nil {
@@ -116,13 +172,29 @@ func (app *application) deleteSound(s *discordgo.Session, m *discordgo.MessageCr
 	}
 
 	err = sounds.DeleteFile(sound.FilePath)
-	if err != nil { 
+	if err != nil {
 		return err
 	}
 
 	_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%v has been deleted\n", name))
 
 	return nil
+}
+
+// wrapper function for the 'delete' command
+func (app *application) deleteCommand(s *discordgo.Session, m *discordgo.MessageCreate) func([]string) error {
+	return func(st []string) error {
+		if len(st) < 1 {
+			return ErrNotEnoughArgs
+		}
+
+		name := st[0]
+		if err := app.deleteSound(s, m, name); err != nil {
+			return err
+		}
+
+		return nil
+	}
 }
 
 // Bot will show all the sounds that available.
@@ -145,4 +217,28 @@ func (app *application) showSounds(s *discordgo.Session, m *discordgo.MessageCre
 
 	_, _ = s.ChannelMessageSend(m.ChannelID, b.String())
 	return nil
+}
+
+// wrapper function for the 'sounds' command
+func (app *application) soundsCommand(s *discordgo.Session, m *discordgo.MessageCreate) func([]string) error {
+	return func(st []string) error {
+		if err := app.showSounds(s, m); err != nil {
+			return err
+		}
+
+		return nil
+	}
+}
+
+func (app *application) pingCommand(s *discordgo.Session, m *discordgo.MessageCreate) func([]string) error {
+	return func(st []string) error {
+		mention := fmt.Sprintf("<@%v>", m.Author.ID)
+		_, err := s.ChannelMessageSend(app.botCfg.BotChannelID, "Pong :D "+mention)
+
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
 }

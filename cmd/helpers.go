@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
-	_ "modernc.org/sqlite"
 	"github.com/tweekes0/pal-bot/config"
+	_ "modernc.org/sqlite"
 )
 
 // Struct to structure command received from *discordgo.Message.Content
@@ -158,8 +158,8 @@ func getRuntime(start string, duration int) (startTime string, dur int) {
 	return
 }
 
-// Take a name and *os.File and transforms it into a discordgo.File
-// needed for sending files to discord channel.
+// Take a name and *os.File and transforms it into a discordgo.
+// File needed for sending files to discord channel.
 func createDiscordFile(name string, f *os.File) *discordgo.File {
 	return &discordgo.File{
 		Name:   fmt.Sprintf("%v.mp3", name),
@@ -167,6 +167,7 @@ func createDiscordFile(name string, f *os.File) *discordgo.File {
 	}
 }
 
+// Creates folder
 func createFolder(path string) error {
 	_, err := os.Stat(path)
 	if os.IsNotExist(err) {
@@ -176,4 +177,18 @@ func createFolder(path string) error {
 	}
 
 	return nil
+}
+
+// Returns a map of type 'Commands'
+func (app *application) getCommands(s *discordgo.Session, m *discordgo.MessageCreate, prefix string) Commands {
+	c := make(Commands)
+	c[fmt.Sprint(prefix, "ping")] = app.pingCommand(s, m)
+	c[fmt.Sprint(prefix, "join")] = app.joinCommand(s, m)
+	c[fmt.Sprint(prefix, "leave")] = app.leaveCommand(s, m)
+	c[fmt.Sprint(prefix, "clip")] = app.clipCommand(s, m)
+	c[fmt.Sprint(prefix, "play")] = app.playCommand(s, m)
+	c[fmt.Sprint(prefix, "delete")] = app.deleteCommand(s, m)
+	c[fmt.Sprint(prefix, "sounds")] = app.soundsCommand(s, m)
+
+	return c
 }

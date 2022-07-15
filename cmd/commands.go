@@ -12,7 +12,8 @@ import (
 
 type Command struct {
 	description string
-	action func(*discordgo.Session, *discordgo.MessageCreate, []string) error
+	help        string
+	action      func(*discordgo.Session, *discordgo.MessageCreate, []string) error
 }
 
 type Commands map[string]Command
@@ -33,7 +34,7 @@ func (app *application) joinVoice(s *discordgo.Session, m *discordgo.MessageCrea
 	return nil
 }
 
-// wrapper function for the 'join' command
+// Wrapper function for the 'join' command
 func (app *application) joinCommand() func(*discordgo.Session, *discordgo.MessageCreate, []string) error {
 	return func(s *discordgo.Session, m *discordgo.MessageCreate, st []string) error {
 		if err := app.joinVoice(s, m); err != nil {
@@ -57,7 +58,7 @@ func (app *application) leaveVoice(s *discordgo.Session, m *discordgo.MessageCre
 	return nil
 }
 
-// wrapper function for the 'leave' command
+// Wrapper function for the 'leave' command
 func (app *application) leaveCommand() func(*discordgo.Session, *discordgo.MessageCreate, []string) error {
 	return func(s *discordgo.Session, m *discordgo.MessageCreate, st []string) error {
 		if err := app.leaveVoice(s, m); err != nil {
@@ -84,7 +85,6 @@ func (app *application) playSound(s *discordgo.Session, m *discordgo.MessageCrea
 	}
 	app.soundbiteCache[name] = soundbite
 
-
 	if err := app.streamSoundBite(s, m, soundbite); err != nil {
 		return err
 	}
@@ -92,10 +92,11 @@ func (app *application) playSound(s *discordgo.Session, m *discordgo.MessageCrea
 	return nil
 }
 
-// wrapper function for the 'play' command
+// Wrapper function for the 'play' command
 func (app *application) playCommand() func(*discordgo.Session, *discordgo.MessageCreate, []string) error {
 	return func(s *discordgo.Session, m *discordgo.MessageCreate, st []string) error {
 		if len(st) < 1 {
+			app.help(s, m, "play")
 			return ErrNotEnoughArgs
 		}
 
@@ -142,7 +143,7 @@ func (app *application) clip(s *discordgo.Session, m *discordgo.MessageCreate, n
 	return nil
 }
 
-// wrapper function for the 'clip' command
+// Wrapper function for the 'clip' command
 func (app *application) clipCommand() func(*discordgo.Session, *discordgo.MessageCreate, []string) error {
 	return func(s *discordgo.Session, m *discordgo.MessageCreate, st []string) error {
 		args, err := parseClipCommand(st)
@@ -151,6 +152,7 @@ func (app *application) clipCommand() func(*discordgo.Session, *discordgo.Messag
 		}
 
 		if err := app.clip(s, m, args.Name, args.Url, args.Start, args.Duration); err != nil {
+			app.help(s, m, "clip")
 			return err
 		}
 
@@ -183,10 +185,11 @@ func (app *application) deleteSound(s *discordgo.Session, m *discordgo.MessageCr
 	return nil
 }
 
-// wrapper function for the 'delete' command
+// Wrapper function for the 'delete' command
 func (app *application) deleteCommand() func(*discordgo.Session, *discordgo.MessageCreate, []string) error {
 	return func(s *discordgo.Session, m *discordgo.MessageCreate, st []string) error {
 		if len(st) < 1 {
+			app.help(s, m, "delete")
 			return ErrNotEnoughArgs
 		}
 
@@ -221,7 +224,7 @@ func (app *application) showSounds(s *discordgo.Session, m *discordgo.MessageCre
 	return nil
 }
 
-// wrapper function for the 'sounds' command
+// Wrapper function for the 'sounds' command
 func (app *application) soundsCommand() func(*discordgo.Session, *discordgo.MessageCreate, []string) error {
 	return func(s *discordgo.Session, m *discordgo.MessageCreate, st []string) error {
 		if err := app.showSounds(s, m); err != nil {
@@ -235,7 +238,6 @@ func (app *application) soundsCommand() func(*discordgo.Session, *discordgo.Mess
 // Function for the 'ping' command
 func (app *application) pingCommand() func(*discordgo.Session, *discordgo.MessageCreate, []string) error {
 	return func(s *discordgo.Session, m *discordgo.MessageCreate, st []string) error {
-		fmt.Println()
 		mention := fmt.Sprintf("<@%v>", m.Author.ID)
 		_, err := s.ChannelMessageSend(app.botCfg.BotChannelID, "Pong :D "+mention)
 
@@ -247,11 +249,10 @@ func (app *application) pingCommand() func(*discordgo.Session, *discordgo.Messag
 	}
 }
 
-// Function for the 'commands' command
-func (app *application) commandsCommand() func(*discordgo.Session, *discordgo.MessageCreate, []string) error {
-	return func(s *discordgo.Session, m *discordgo.MessageCreate, st []string) error {
-		var sb strings.Builder
-		keys :=[]string{}
+// Bot will send the list commands and their descriptiions
+func (app *application) listCommands(s *discordgo.Session, m *discordgo.MessageCreate) error {
+	var sb strings.Builder
+		keys := []string{}
 
 		for k := range app.commands {
 			keys = append(keys, k)
@@ -263,6 +264,40 @@ func (app *application) commandsCommand() func(*discordgo.Session, *discordgo.Me
 		}
 
 		_, _ = s.ChannelMessageSend(m.ChannelID, sb.String())
-		return nil	
+		return nil
+}
+
+// Wrapper function for the 'commands' command
+func (app *application) commandsCommand() func(*discordgo.Session, *discordgo.MessageCreate, []string) error {
+	return func(s *discordgo.Session, m *discordgo.MessageCreate, st []string) error {
+		return app.listCommands(s, m)
+	}
+}
+
+// Bot will send the command's help info as a mention
+func (app *application) help(s *discordgo.Session, m *discordgo.MessageCreate, command string) {
+	var sb strings.Builder
+	sb.Write([]byte(app.commands[fmt.Sprint(app.botCfg.CommandPrefix, command)].help))
+	sb.Write([]byte(fmt.Sprintf("\n<@%v>", m.Author.ID)))
+	_, _ = s.ChannelMessageSend(m.ChannelID, sb.String())
+}
+
+// Wrapper function for the 'help' command
+func (app *application) helpCommand() func(*discordgo.Session, *discordgo.MessageCreate, []string) error {
+	return func(s *discordgo.Session, m *discordgo.MessageCreate, st []string) error {
+		if len(st) < 1 {
+			app.commandsCommand() 
+			return nil
+		}
+
+		name := st[0]
+
+		if command, ok := app.commands[fmt.Sprint(app.botCfg.CommandPrefix, name)]; ok {
+			if command.help != "" {
+				app.help(s, m, name)
+			}
+		}
+
+		return nil
 	}
 }

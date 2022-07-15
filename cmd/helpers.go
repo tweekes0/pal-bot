@@ -16,14 +16,28 @@ import (
 
 // Descriptions for commands
 const (
-	pingDesc   = "Pong :D"
-	joinDesc   = "Joins to the user's current VoiceChannel"
-	leaveDesc  = "Leaves the current VoiceChannel"
-	clipDesc   = "Create a youtube video and create a soundbite from it. **!help clip** for more"
-	playDesc   = "Play a sound that has been clipped"
-	deleteDesc = "Delete a clipped soundbite, the user created"
-	soundsDesc = "List all available sounds"
+	pingDesc     = "Pong :D"
+	joinDesc     = "Joins to the user's current VoiceChannel"
+	leaveDesc    = "Leaves the current VoiceChannel"
+	clipDesc     = "Take a youtube video and create a soundbite from it. Soundbites cannot be longer than 10 seconds.  **!help clip** for more info."
+	playDesc     = "Play a sound that has been clipped. **!help play** for more info."
+	deleteDesc   = "Delete a clipped soundbite the user created.  **!help delete** for more info."
+	soundsDesc   = "List all available sounds"
 	commandsDesc = "List all available commands"
+	helpDesc     = "Get help and usage for specified commands"
+
+	playHelp = `**!play** SOUNDNAME
+**Example:** !play pika
+Plays the 'pika' soundbite in the user's current VoiceChannel. Use **!sounds** to see all available sounds`
+	clipHelp = `**!iclip** SOUNDNAME YOUTUBE_URL START_TIME(optional) DURATION(optional)
+**Example:** !clip coolsound youtube.com/ID 00:23 5
+Creates a new sound called 'coolsound' that starts at 00:23 and is 5 seconds long`
+	deleteHelp = `**!delete** SOUNDNAME
+**Example:** !delete pika
+Deletes the soundbite the user created named 'pika'`
+	helpHelp = `**!help** COMAND_NAME
+**Example:** !help clip
+Displays help information for the 'clip' command`
 )
 
 // Struct to structure command received from *discordgo.Message.Content
@@ -194,16 +208,54 @@ func createFolder(path string) error {
 }
 
 // Returns a map of all 'Commands'
-func (app *application) getCommands(prefix string) Commands{
+func (app *application) getCommands(prefix string) Commands {
 	c := make(Commands)
-	c[fmt.Sprint(prefix, "ping")] = Command{pingDesc, app.pingCommand()}
-	c[fmt.Sprint(prefix, "join")] = Command{joinDesc, app.joinCommand()}
-	c[fmt.Sprint(prefix, "leave")] = Command{leaveDesc, app.leaveCommand()}
-	c[fmt.Sprint(prefix, "clip")] = Command{clipDesc, app.clipCommand()}
-	c[fmt.Sprint(prefix, "play")] = Command{playDesc, app.playCommand()}
-	c[fmt.Sprint(prefix, "delete")] = Command{deleteDesc, app.deleteCommand()}
-	c[fmt.Sprint(prefix, "sounds")] = Command{soundsDesc, app.soundsCommand()}
-	c[fmt.Sprint(prefix, "commands")] = Command{commandsDesc, app.commandsCommand()}
+	c[fmt.Sprint(prefix, "ping")] = Command{
+		description: pingDesc,
+		help:        pingDesc,
+		action:      app.pingCommand(),
+	}
+	c[fmt.Sprint(prefix, "join")] = Command{
+		description: joinDesc,
+		help:        joinDesc,
+		action:      app.joinCommand(),
+	}
+	c[fmt.Sprint(prefix, "leave")] = Command{
+		description: leaveDesc,
+		help:        leaveDesc, 
+		action:      app.leaveCommand(),
+	}
+	c[fmt.Sprint(prefix, "clip")] = Command{
+		description: clipDesc,
+		help:        clipHelp,
+		action:      app.clipCommand(),
+	}
+	c[fmt.Sprint(prefix, "play")] = Command{
+		description: playDesc,
+		help:        playHelp,
+		action:      app.playCommand(),
+	}
+	c[fmt.Sprint(prefix, "delete")] = Command{
+		description: deleteDesc,
+		help:        deleteHelp,
+		action:      app.deleteCommand(),
+	}
+	c[fmt.Sprint(prefix, "sounds")] = Command{
+		description: soundsDesc,
+		help:        soundsDesc,
+		action:      app.soundsCommand(),
+	}
+	c[fmt.Sprint(prefix, "commands")] = Command{
+		description: commandsDesc,
+		help:        commandsDesc,
+		action:      app.commandsCommand(),
+	}
+
+	c[fmt.Sprint(prefix, "help")] = Command{
+		description: helpDesc,
+		help:        helpHelp,
+		action:      app.helpCommand(),
+	}
 
 	return c
 }

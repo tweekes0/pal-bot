@@ -286,8 +286,7 @@ func (app *application) help(s *discordgo.Session, m *discordgo.MessageCreate, c
 func (app *application) helpCommand() func(*discordgo.Session, *discordgo.MessageCreate, []string) error {
 	return func(s *discordgo.Session, m *discordgo.MessageCreate, st []string) error {
 		if len(st) < 1 {
-			app.commandsCommand() 
-			return nil
+			return app.listCommands(s, m)
 		}
 
 		name := st[0]

@@ -15,9 +15,10 @@ import (
 
 // Struct that holds the bot's loggers and state necessary
 // to control the bot
-type application struct {
+type Context struct {
 	botID          string
 	botCfg         *config.BotConfig
+	commands       Commands
 	errorLogger    *log.Logger
 	infoLogger     *log.Logger
 	vc             *discordgo.VoiceConnection
@@ -25,7 +26,6 @@ type application struct {
 	joinedVoice    bool
 	isSpeaking     bool
 	soundbiteCache map[string]*models.Soundbite
-	commands Commands
 }
 
 func main() {
@@ -71,7 +71,7 @@ func main() {
 		errLog.Fatalln(err)
 	}
 
-	app := &application{
+	ctx := &Context{
 		joinedVoice:    false,
 		isSpeaking:     false,
 		botID:          botID,
@@ -81,19 +81,19 @@ func main() {
 		soundbiteModel: &models.SoundbiteModel{DB: db},
 	}
 
-	app.soundbiteModel.Initialize()
+	ctx.soundbiteModel.Initialize()
 
 	// Create a cache of all the soundbites in the db
-	soundbiteCache, err := app.createSoundsCache()
+	soundbiteCache, err := ctx.createSoundsCache()
 	if err != nil {
 		errLog.Fatalln(err)
 	}
 
-	app.soundbiteCache = soundbiteCache
+	ctx.soundbiteCache = soundbiteCache
 
-	bot.AddHandler(app.messageCreate)
-	bot.AddHandler(app.voiceStateChange)
-	bot.AddHandler(app.guildJoin)
+	bot.AddHandler(ctx.messageCreate)
+	bot.AddHandler(ctx.voiceStateChange)
+	bot.AddHandler(ctx.guildJoin)
 
 	infoLog.Println("Bot is now running. Press CTRL-C to exit")
 

@@ -19,12 +19,12 @@ const (
 	pingDesc     = "Pong :D"
 	joinDesc     = "Joins to the user's current VoiceChannel"
 	leaveDesc    = "Leaves the current VoiceChannel"
-	clipDesc     = "Take a youtube video and create a soundbite from it. Soundbites cannot be longer than 10 seconds.  **!help clip** for more info."
-	playDesc     = "Play a sound that has been clipped. **!help play** for more info."
-	deleteDesc   = "Delete a clipped soundbite the user created.  **!help delete** for more info."
+	clipDesc     = "Take a youtube video and create a soundbite from it. Soundbites cannot be longer than 10 seconds.  **!Help clip** for more info."
+	playDesc     = "Play a sound that has been clipped. **!Help play** for more info."
+	deleteDesc   = "Delete a clipped soundbite the user created.  **!Help delete** for more info."
 	soundsDesc   = "List all available sounds"
 	commandsDesc = "List all available commands"
-	helpDesc     = "Get help and usage for specified commands"
+	helpDesc     = "Get Help and usage for specified commands"
 
 	playHelp = `**!play** SOUNDNAME
 **Example:** !play pika
@@ -35,9 +35,9 @@ Creates a new sound called 'coolsound' that starts at 00:23 and is 5 seconds lon
 	deleteHelp = `**!delete** SOUNDNAME
 **Example:** !delete pika
 Deletes the soundbite the user created named 'pika'`
-	helpHelp = `**!help** COMAND_NAME
-**Example:** !help clip
-Displays help information for the 'clip' command`
+	helpHelp = `**!Help** COMAND_NAME
+**Example:** !Help clip
+Displays Help information for the 'clip' command`
 )
 
 // Struct to structure command received from *discordgo.Message.Content
@@ -208,61 +208,60 @@ func createFolder(path string) error {
 }
 
 // Returns a map of all 'Commands'
-func (app *application) getCommands(prefix string) Commands {
-	c := make(Commands)
-	c[fmt.Sprint(prefix, "ping")] = Command{
-		description: pingDesc,
-		help:        pingDesc,
-		action:      app.pingCommand(),
+func (ctx *Context) getCommands(prefix string) Commands {
+	commands := make(Commands)
+	commands[fmt.Sprint(prefix, "ping")] = Command{
+		Description: pingDesc,
+		Help:        pingDesc,
+		Action:      ctx.pingCommand(),
 	}
-	c[fmt.Sprint(prefix, "join")] = Command{
-		description: joinDesc,
-		help:        joinDesc,
-		action:      app.joinCommand(),
+	commands[fmt.Sprint(prefix, "join")] = Command{
+		Description: joinDesc,
+		Help:        joinDesc,
+		Action:      ctx.joinCommand(),
 	}
-	c[fmt.Sprint(prefix, "leave")] = Command{
-		description: leaveDesc,
-		help:        leaveDesc, 
-		action:      app.leaveCommand(),
+	commands[fmt.Sprint(prefix, "leave")] = Command{
+		Description: leaveDesc,
+		Help:        leaveDesc, 
+		Action:      ctx.leaveCommand(),
 	}
-	c[fmt.Sprint(prefix, "clip")] = Command{
-		description: clipDesc,
-		help:        clipHelp,
-		action:      app.clipCommand(),
+	commands[fmt.Sprint(prefix, "clip")] = Command{
+		Description: clipDesc,
+		Help:        clipHelp,
+		Action:      ctx.clipCommand(),
 	}
-	c[fmt.Sprint(prefix, "play")] = Command{
-		description: playDesc,
-		help:        playHelp,
-		action:      app.playCommand(),
+	commands[fmt.Sprint(prefix, "play")] = Command{
+		Description: playDesc,
+		Help:        playHelp,
+		Action:      ctx.playCommand(),
 	}
-	c[fmt.Sprint(prefix, "delete")] = Command{
-		description: deleteDesc,
-		help:        deleteHelp,
-		action:      app.deleteCommand(),
+	commands[fmt.Sprint(prefix, "delete")] = Command{
+		Description: deleteDesc,
+		Help:        deleteHelp,
+		Action:      ctx.deleteCommand(),
 	}
-	c[fmt.Sprint(prefix, "sounds")] = Command{
-		description: soundsDesc,
-		help:        soundsDesc,
-		action:      app.soundsCommand(),
+	commands[fmt.Sprint(prefix, "sounds")] = Command{
+		Description: soundsDesc,
+		Help:        soundsDesc,
+		Action:      ctx.soundsCommand(),
 	}
-	c[fmt.Sprint(prefix, "commands")] = Command{
-		description: commandsDesc,
-		help:        commandsDesc,
-		action:      app.commandsCommand(),
+	commands[fmt.Sprint(prefix, "commands")] = Command{
+		Description: commandsDesc,
+		Help:        commandsDesc,
+		Action:      ctx.commandsCommand(),
+	}
+	commands[fmt.Sprint(prefix, "Help")] = Command{
+		Description: helpDesc,
+		Help:        helpHelp,
+		Action:      ctx.helpCommand(),
 	}
 
-	c[fmt.Sprint(prefix, "help")] = Command{
-		description: helpDesc,
-		help:        helpHelp,
-		action:      app.helpCommand(),
-	}
-
-	return c
+	return commands
 }
 
 // Create a map for a cache of soundbites
-func (app *application) createSoundsCache() (map[string]*models.Soundbite, error) {
-	sounds, err := app.soundbiteModel.GetAll()
+func (ctx *Context) createSoundsCache() (map[string]*models.Soundbite, error) {
+	sounds, err := ctx.soundbiteModel.GetAll()
 	if err != nil {
 		return nil, err
 	}
@@ -276,12 +275,12 @@ func (app *application) createSoundsCache() (map[string]*models.Soundbite, error
 }
 
 // Load and stream a soundbite into a VoiceChannel.
-func (app *application) streamSoundBite(s *discordgo.Session, m *discordgo.MessageCreate, soundbite *models.Soundbite) error {
-	if err := app.joinVoice(s, m); err != nil {
+func (ctx *Context) streamSoundBite(s *discordgo.Session, m *discordgo.MessageCreate, soundbite *models.Soundbite) error {
+	if err := ctx.joinVoice(s, m); err != nil {
 		return err
 	}
 
-	if app.isSpeaking {
+	if ctx.isSpeaking {
 		return nil
 	}
 
@@ -290,13 +289,13 @@ func (app *application) streamSoundBite(s *discordgo.Session, m *discordgo.Messa
 		return err
 	}
 
-	app.vc.Speaking(true)
-	app.isSpeaking = true
+	ctx.vc.Speaking(true)
+	ctx.isSpeaking = true
 	for _, b := range buf {
-		app.vc.OpusSend <- b
+		ctx.vc.OpusSend <- b
 	}
 
-	app.vc.Speaking(false)
-	app.isSpeaking = false
+	ctx.vc.Speaking(false)
+	ctx.isSpeaking = false
 	return nil
 }

@@ -49,6 +49,6 @@ func (app *application) voiceStateChange(s *discordgo.Session, vs *discordgo.Voi
 }
 
 func (app *application) guildJoin(s *discordgo.Session, g *discordgo.GuildCreate) {
-	msg := "Hi @everyone, I am Pal Bot"
+	msg := "Hi @everyone, I am Pal Bot.\n**!commands** to see a list of my commands."
 	_, _ = s.ChannelMessageSend(app.botCfg.BotChannelID, msg)
 }

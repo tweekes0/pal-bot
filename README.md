@@ -5,7 +5,7 @@ the [discordgo](https://github.com/bwmarrin/discordgo) library to create soundbi
 
 ## Running Pal Bot
 
-efore Pal Bot can be added to your Discord server, you must create your own configuration file. See [example_config.toml](https://github.com/tweekes0/pal-bot/blob/main/example_config.toml). Although Pal Bot is Dockerized, it is not a stateless application and will be error prone if deployed to serverless solution.
+Before Pal Bot can be added to your Discord server, you must create your own configuration file. See [example_config.toml](https://github.com/tweekes0/pal-bot/blob/main/example_config.toml). Although Pal Bot is Dockerized, it is not a stateless application and will be error prone if deployed to serverless solution.
 
 ### Docker and Docker-Compose (Recommeded)
 

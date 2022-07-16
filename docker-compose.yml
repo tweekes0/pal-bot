@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pal-bot
+    volumes:
+      - ./data/audio:/pal-bot/data/audio
+      - ./data/db:/pal-bot/data/db
+
+    

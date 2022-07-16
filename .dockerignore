@@ -1,0 +1,6 @@
+playground/
+.air.toml
+.gitignore
+./tmp/
+audio/
+db/

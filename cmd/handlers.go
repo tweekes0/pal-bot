@@ -9,6 +9,10 @@ import (
 
 // Handler for when the bot receives a command
 func (ctx *Context) messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
+	if m.Content == "" {
+		return 
+	}
+	
 	mention := fmt.Sprintf("<@%v>", m.Author.ID)
 
 	if m.Author.ID == ctx.botID {

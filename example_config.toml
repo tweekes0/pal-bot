@@ -10,4 +10,4 @@ CommandPrefix = "!"
 
 # The channel where the bot will receive commands.
 # To find a channel ID read here: https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-
-BotChannelID = "BOT_CHANNEL_ID"0
+BotChannelID = "BOT_CHANNEL_ID"

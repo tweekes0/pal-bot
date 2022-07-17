@@ -29,7 +29,7 @@ docker-compose up
 Requires [ffmpeg](https://ffmpeg.org/) and [dca](https://github.com/bwmarrin/dca) to be installed.
 
 ```
-sudp apt install ffmpeg // fairly large application
+sudo apt install ffmpeg // fairly large application
 git clone https://github.com/tweekes0/pal-bot
 go get -u github.com/bwmarrin/dca/cmd/dca@latest
 go run ./cmd/

@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"errors"
+	"strings"
 	"time"
 )
 
@@ -53,6 +54,10 @@ func (m *SoundbiteModel) Insert(name, username, uid, filepath, filehash string) 
 
 	res, err := m.DB.Exec(stmt, name, username, uid, filepath, filehash)
 	if err != nil {
+		if strings.Contains(err.Error(), "UNIQUE constraint") {
+			return 0, ErrUniqueConstraint
+		}
+
 		return 0, err
 	}
 
@@ -152,7 +157,7 @@ func (m *SoundbiteModel) Delete(name, uid string) error {
 
 	c, err := res.RowsAffected()
 	if err != nil {
-		return nil
+		return err
 	}
 
 	if int(c) == 0 {

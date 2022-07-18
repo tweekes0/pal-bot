@@ -5,6 +5,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/tweekes0/pal-bot/config"
 	"github.com/tweekes0/pal-bot/internal/sounds"
 
 	"github.com/bwmarrin/discordgo"
@@ -113,7 +114,7 @@ func (ctx *Context) playCommand() func(*discordgo.Session, *discordgo.MessageCre
 func (ctx *Context) clip(s *discordgo.Session, m *discordgo.MessageCreate, name, url, startTime string, duration int) error {
 	start, dur := getRuntime(startTime, duration)
 
-	f, mp3, err := sounds.CreateDCAFile(url, start, dur)
+	f, mp3, err := sounds.CreateDCAFile(config.AUDIO_DIR, url, start, dur)
 	if err != nil {
 		return err
 	}

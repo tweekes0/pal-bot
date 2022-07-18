@@ -6,59 +6,68 @@ import (
 	"io"
 	"os"
 	"os/exec"
-
-	"github.com/tweekes0/pal-bot/config"
+	"time"
 
 	"github.com/kkdai/youtube/v2"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 )
 
 // Downloads a youtube video and returns an mp4 file if the download is succesful.
-func downloadYoutubeVideo(url string) (*os.File, error) {
+func downloadYoutubeVideo(url string) (*os.File, time.Duration, error) {
 	client := &youtube.Client{}
 	video, err := client.GetVideo(url)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	format := video.Formats.WithAudioChannels()
 	stream, _, err := client.GetStream(video, &format[0])
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	file, err := os.CreateTemp("", "*.mp4")
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	defer file.Close()
 
 	_, err = io.Copy(file, stream)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	return file, nil
+	return file, video.Duration, nil
 }
 
 // Converts an mp4 file to a AAC file.
-func createAACFile(url, startTime string, duration int) (*os.File, error) {
-	videoFile, err := downloadYoutubeVideo(url)
+func createAACFile(path, url, startTime string, duration int) (*os.File, error) {
+	videoFile, d,  err := downloadYoutubeVideo(url)
 	if err != nil {
 		return nil, err
 	}
 
+	st, err := startTimeToDuration(startTime)
+	if err != nil {
+		return nil, err
+	}
+
+	if st.Seconds() > d.Seconds() {
+		return nil, ErrInvalidStartTime
+	}
+	
 	if duration > 10 || duration < 1 {
 		return nil, ErrInvalidDuration
 	}
-
+	
 	if startTime == "" {
 		startTime = "00:00"
 		duration = 10
 	}
 
+
 	fname := getFilename(videoFile.Name())
-	output := fmt.Sprintf("%v/%v.aac", config.AUDIO_DIR, fname)
+	output := fmt.Sprintf("%v/%v.aac", path, fname)
 	kwargs := ffmpeg.KwArgs{"ss": startTime, "vn": "", "acodec": "copy"}
 
 	if duration != 0 {
@@ -85,8 +94,8 @@ func createAACFile(url, startTime string, duration int) (*os.File, error) {
 
 // Converts and AAC file to a DCA file, file that can be streamed to discord VoiceChannel.
 // Returns a the DCA file and an MP3 file that is needed to be sent as an embed to a TextChannel.
-func CreateDCAFile(url, startTime string, duration int) (*os.File, *os.File, error) {
-	aac, err := createAACFile(url, startTime, duration)
+func CreateDCAFile(path, url, startTime string, duration int) (*os.File, *os.File, error) {
+	aac, err := createAACFile(path, url, startTime, duration)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -100,7 +109,7 @@ func CreateDCAFile(url, startTime string, duration int) (*os.File, *os.File, err
 	}
 
 	fname := getFilename(aac.Name())
-	f, err := os.Create(fmt.Sprintf("%v/%v.dca", config.AUDIO_DIR, fname))
+	f, err := os.Create(fmt.Sprintf("%v/%v.dca", path, fname))
 	if err != nil {
 		return nil, nil, err
 	}

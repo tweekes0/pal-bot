@@ -10,9 +10,9 @@ import (
 // Handler for when the bot receives a command
 func (ctx *Context) messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Content == "" {
-		return 
+		return
 	}
-	
+
 	mention := fmt.Sprintf("<@%v>", m.Author.ID)
 
 	if m.Author.ID == ctx.botID {
@@ -24,10 +24,10 @@ func (ctx *Context) messageCreate(s *discordgo.Session, m *discordgo.MessageCrea
 		_, _ = s.ChannelMessageSend(ctx.botCfg.BotChannelID, msg)
 		return
 	}
-	
+
 	if ctx.commands == nil {
 		ctx.commands = ctx.getCommands(ctx.botCfg.CommandPrefix)
-	} 
+	}
 
 	c := parseCommand(m.Content)
 

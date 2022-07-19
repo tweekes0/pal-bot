@@ -147,6 +147,10 @@ func CreateDCAFile(path, url, startTime string, duration int) (*os.File, *os.Fil
 
 // Convert an AAC file into a MP3 using FFMPEG
 func createMP3File(aac *os.File) (*os.File, error) {
+	if aac == nil {
+		return nil, ErrInvalidFile
+	}
+
 	mp3, err := os.CreateTemp("", "*.mp3")
 	if err != nil {
 		return nil, err

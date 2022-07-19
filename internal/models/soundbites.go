@@ -79,7 +79,7 @@ func (m *SoundbiteModel) Get(name string) (*Soundbite, error) {
 	err := m.DB.QueryRow(stmt, name).Scan(&s.ID, &s.Name, &s.Username, &s.UserID, &s.FilePath, &s.FileHash, &date)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrNoRecords
+			return nil, ErrDoesNotExist
 		}
 
 		return nil, err
@@ -124,6 +124,10 @@ func (m *SoundbiteModel) GetAll() ([]*Soundbite, error) {
 		soundbites = append(soundbites, s)
 	}
 
+	if len(soundbites) == 0 {
+		return soundbites, ErrNoRecords
+	}
+
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
@@ -131,7 +135,7 @@ func (m *SoundbiteModel) GetAll() ([]*Soundbite, error) {
 	return soundbites, nil
 }
 
-// Check whether a soundbite exists based on the name of the command it's filehash filehash
+// Check whether a soundbite exists based on the name of the command and it's filehash 
 func (m *SoundbiteModel) Exists(name, hash string) (bool, error) {
 	var exists bool
 
@@ -143,6 +147,10 @@ func (m *SoundbiteModel) Exists(name, hash string) (bool, error) {
 
 // Deletes the soundbite if the user_id and name belong to the same record
 func (m *SoundbiteModel) Delete(name, uid string) error {
+	if exists, _ := m.Exists(name, ""); !exists {
+		return ErrDoesNotExist
+	}
+
 	if err := m.userCreatedCommand(name, uid); err != nil {
 		return err
 	}

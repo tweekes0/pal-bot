@@ -7,11 +7,9 @@ RUN go install github.com/bwmarrin/dca/cmd/dca@latest
 COPY . ./
 RUN GOOS=linux CGO_ENABLED=1 GOARCH=amd64 go build -ldflags="-w -s" -o /usr/local/bin/pal-bot ./cmd/
 
-FROM alpine:latest 
-RUN apk update \
-    && apk add --no-cache libc6-compat \
-    && apk add ffmpeg \
-    && apk add ca-certificates \
+FROM ubuntu:latest 
+RUN apt-get update \ 
+    && apt-get install ca-certificates ffmpeg -y \ 
     && update-ca-certificates
 WORKDIR /pal-bot/
 COPY --from=build /usr/local/bin/pal-bot /usr/local/go/src/pal-bot/config.toml ./

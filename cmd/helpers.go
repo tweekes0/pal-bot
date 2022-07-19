@@ -11,7 +11,7 @@ import (
 	"github.com/tweekes0/pal-bot/config"
 	"github.com/tweekes0/pal-bot/internal/models"
 	"github.com/tweekes0/pal-bot/internal/sounds"
-	_ "modernc.org/sqlite"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 // Descriptions for commands

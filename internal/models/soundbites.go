@@ -184,9 +184,9 @@ func (m *SoundbiteModel) UpdateName(oldName, newName string) error {
 		return ErrUniqueConstraint
 	}
 
-	stmt := `UPDATE soundbites set name = ? where name = ?`
+	stmt := `UPDATE soundbites SET name = ? where name = ?`
 	
-	_, err = m.DB.Query(stmt, newName, oldName)
+	_, err = m.DB.Exec(stmt, newName, oldName)
 	if err != nil {
 		return err
 	}

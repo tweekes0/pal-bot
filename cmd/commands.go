@@ -347,7 +347,7 @@ func (ctx *Context) upload(s *discordgo.Session, m *discordgo.MessageCreate, nam
 func (ctx *Context) uploadCommand() func(*discordgo.Session, *discordgo.MessageCreate, []string) error {
 	return func(s *discordgo.Session, m *discordgo.MessageCreate, st[]string) error {
 		if len(st) < 1 {
-			ctx.help(s, m, "delete")
+			ctx.help(s, m, "upload")
 			return ErrNotEnoughArgs
 		}
 	 
@@ -358,4 +358,37 @@ func (ctx *Context) uploadCommand() func(*discordgo.Session, *discordgo.MessageC
 
 		return nil
 	}
+}
+
+func (ctx *Context) rename(s *discordgo.Session, m *discordgo.MessageCreate, oldName, newName string) error {
+	err := ctx.soundbiteModel.UpdateName(oldName, newName)
+	if err != nil {
+		return err
+	}
+
+	sound, err := ctx.soundbiteModel.Get(newName)
+	if err != nil {
+		return err
+	}
+
+	delete(ctx.soundbiteCache, oldName)
+	
+	ctx.soundbiteCache[newName] = sound
+	return nil
+}
+
+func (ctx *Context) renameCommand() func(*discordgo.Session, *discordgo.MessageCreate, []string) error {
+	return func(s *discordgo.Session, m *discordgo.MessageCreate, st []string) error {
+		if len(st) < 2 {
+			ctx.help(s, m, "rename")			
+			return ErrNotEnoughArgs
+		}
+
+		err := ctx.rename(s, m, st[0], st[1])
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}	
 }

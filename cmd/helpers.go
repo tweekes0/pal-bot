@@ -25,6 +25,7 @@ const (
 	commandsDesc = "List all available commands"
 	helpDesc     = "Get help and usage for specified commands"
 	uploadDesc   = "Upload an mp3 and create a sounbite from it"
+	renameDesc   = "Renames a soundbite"
 
 	clipHelp = `**!clip** [SOUNDNAME] [YOUTUBE_URL] <START_TIME>(optional) <DURATION>(optional)
 **Example:** !clip coolsound youtube.com/ID 00:23 5
@@ -35,6 +36,9 @@ Deletes the soundbite the user created named 'pika'`
 	helpHelp = `**!help** [COMAND_NAME]
 **Example:** !help clip
 Displays Help information for the 'clip' command`
+	renameHelp = `**!rename [OLD_SOUNDNAME] [NEW_SOUNDNAME]
+**Example:** !rename jigglypuff jp
+Rename the 'jigglypuff' soundbite to 'jp'`
 	soundsHelp = `**![SOUNDNAME]** to play soundbite
 **Example:** !jigglypuff
 Plays the 'jigglypuff' soundbite`
@@ -257,6 +261,11 @@ func (ctx *Context) getCommands(prefix string) Commands {
 		Description: uploadDesc,
 		Help:        uploadHelp,
 		Action:      ctx.uploadCommand(),
+	}
+	commands[fmt.Sprint(prefix, "rename")] = Command{
+		Description: renameDesc,
+		Help:        renameHelp,
+		Action:      ctx.renameCommand(),
 	}
 
 	return commands

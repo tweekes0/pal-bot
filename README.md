@@ -48,6 +48,7 @@ Commands must be prefixed with prefix defined in 'config.toml'
 | **ping**     | Pong :D                                                       |
 | **sounds**   | List all available sounds                                     |
 | **!upload**  | Upload an mp3 and create a sounbite from it                   |
+| **!rename**  | Rename soundbiets                                             |
 
 ## Examples
 

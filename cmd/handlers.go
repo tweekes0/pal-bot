@@ -35,6 +35,23 @@ func (ctx *Context) messageCreate(s *discordgo.Session, m *discordgo.MessageCrea
 		err := command.Action(s, m, c.args)
 		if err != nil {
 			ctx.errorLogger.Println(err)
+			return
+		}
+	} else {
+		sl := strings.Split(c.command, ctx.botCfg.CommandPrefix)
+		soundName := sl[len(sl) - 1]
+		exists, err := ctx.soundbiteModel.Exists(soundName, "")
+		if err != nil {
+			ctx.errorLogger.Println(err)
+			return
+		}
+
+		if exists {
+			err := ctx.playSound(s, m, soundName)
+			if err != nil {
+				ctx.errorLogger.Println(err)
+				return
+			}
 		}
 	}
 }

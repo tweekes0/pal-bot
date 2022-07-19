@@ -216,7 +216,7 @@ func (ctx *Context) showSounds(s *discordgo.Session, m *discordgo.MessageCreate)
 	}
 
 	var b strings.Builder
-	fmt.Fprint(&b, "Available Sounds: \n")
+	fmt.Fprint(&b, "**Available Sounds:** \n")
 	for _, sound := range sounds {
 		fmt.Fprintf(&b, "%v\n", sound.Name)
 	}

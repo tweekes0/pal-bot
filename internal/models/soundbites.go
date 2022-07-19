@@ -151,7 +151,7 @@ func (m *SoundbiteModel) Delete(name, uid string) error {
 		return ErrDoesNotExist
 	}
 
-	if err := m.userCreatedCommand(name, uid); err != nil {
+	if err := m.userCreatedSound(name, uid); err != nil {
 		return err
 	}
 
@@ -175,7 +175,7 @@ func (m *SoundbiteModel) Delete(name, uid string) error {
 }
 
 // Checks that the user_id of the soundbite belongs to the user requesting the delete
-func (m *SoundbiteModel) userCreatedCommand(name, uid string) error {
+func (m *SoundbiteModel) userCreatedSound(name, uid string) error {
 	var exists bool
 	stmt := `SELECT EXISTS(SELECT 1 FROM soundbites where name = ? AND user_id = ?);`
 

@@ -118,8 +118,117 @@ func TestGet(t *testing.T) {
 		test.AssertError(t, err, nil)
 
 		_, err = m.Get(s2.Name)
-		test.AssertError(t, err, ErrNoRecords)
+		test.AssertError(t, err, ErrDoesNotExist)
 	})
 }
 
+func TestGetAll(t *testing.T) {
+	t.Run("get all from empty table", func(t *testing.T) {
+		m, teardown := modelsTestSetup(t)	
+		defer teardown()
 
+		sounds, err := m.GetAll()
+		test.AssertError(t, err, ErrNoRecords)
+
+		if len(sounds) != 0 {
+			t.Fatalf("got: %v, expected: %v", len(sounds), 0)
+		}
+	})
+
+	t.Run("get all from populated table", func(t *testing.T) {
+		m, teardown := modelsTestSetup(t)
+		defer teardown()
+
+		expected := []*Soundbite{s1, s2, s3}
+
+		_,_ = mockInsert(m, s1)
+		_,_ = mockInsert(m, s2)
+		_,_ = mockInsert(m, s3)
+
+		sounds, err := m.GetAll()
+		for _, s := range sounds {
+			s.Created = time.Time{}
+		}
+
+		test.AssertError(t, err, nil)
+		test.AssertType(t, sounds, expected)
+	})
+}
+
+func TestExists(t *testing.T) {
+	t.Run("exists in an empty table", func(t *testing.T) {
+		m, teardown := modelsTestSetup(t)
+		defer teardown()
+
+		b, err := m.Exists(s1.Name, s1.FileHash)
+		test.AssertError(t, err, nil)
+		test.AssertType(t, b, false)
+	})
+
+	t.Run("exists in a table", func(t *testing.T) {
+		m, teardown := modelsTestSetup(t)
+		defer teardown()
+
+		_, _ = mockInsert(m, s1)
+
+		b, err := m.Exists(s1.Name, s1.FileHash)
+		test.AssertError(t, err, nil)
+		test.AssertType(t, b, true)
+	})
+
+	t.Run("exists but incorrect name and filehash", func(t *testing.T) {
+		m, teardown := modelsTestSetup(t)
+		defer teardown()
+
+		_, _ = mockInsert(m, s1)
+
+		b, err := m.Exists(s2.Name, s2.FileHash)
+		test.AssertError(t, err, nil)
+		test.AssertType(t, b, false)
+
+		b, err = m.Exists(s1.Name, s1.FileHash)
+		test.AssertError(t, err, nil)
+		test.AssertType(t, b, true)
+	})
+}
+
+func TestDelete(t *testing.T) {
+	t.Run("delete from empty table", func(t *testing.T) {
+		m, teardown := modelsTestSetup(t)
+		defer teardown()
+
+		err := m.Delete(s1.Name, s1.UserID)
+		test.AssertError(t, err, ErrDoesNotExist)
+	})
+
+	t.Run("delete from table", func(t *testing.T) {
+		m, teardown := modelsTestSetup(t)
+		defer teardown()
+
+		_, _ = mockInsert(m, s1)
+
+		err := m.Delete(s1.Name, s1.UserID)
+		test.AssertError(t, err, nil)
+
+		sounds, err := m.GetAll()
+		test.AssertError(t, err, ErrNoRecords)
+		if len(sounds) != 0 {
+			t.Fatalf("got: %v, expected: %v", len(sounds), 0)
+		}
+	})
+}
+
+func TestUserCreatedSound(t *testing.T) {
+	t.Run("test user created sound", func(t *testing.T) {
+		m, teardown := modelsTestSetup(t)
+		defer teardown()
+
+		_, _ = mockInsert(m, s1)
+		
+		err := m.userCreatedSound(s1.Name, s1.UserID)
+		test.AssertError(t, err, nil)
+
+		err = m.userCreatedSound(s1.Name, s2.UserID)
+		test.AssertError(t, err, ErrCommandOwnership)
+	})
+}

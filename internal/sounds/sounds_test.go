@@ -22,6 +22,10 @@ type fileInput struct {
 	duration int
 }
 
+const (
+	testURL = "https://www.youtube.com/watch?v=vkFRAIKpKmE"
+)
+
 func TestDownloadYoutubeVideo(t *testing.T) {
 	tt := []struct {
 		description string
@@ -181,4 +185,47 @@ func TestCreateDCAFile(t *testing.T) {
 			test.AssertError(t, got, tc.expected)
 		})
 	}
+}
+
+func TestCreateMP3File(t *testing.T) {
+	t.Run("Create MP3 file from valid AAC", func(t *testing.T) {
+		dir, _ := ioutil.TempDir("", "*")
+		defer os.RemoveAll(dir)
+
+		aac, err := createAACFile(dir, testURL, "00:00", 10)
+		defer DeleteFile(aac.Name())
+
+		test.AssertError(t, err, nil)
+		if aac == nil {
+			t.Fatalf("got: %v expected: %v", aac, nil)
+		}
+
+		mp3, err := createMP3File(aac)
+		defer DeleteFile(mp3.Name())
+
+		test.AssertError(t, err, nil)
+	})
+
+	t.Run("create MP3 file from invalid AAC", func(t *testing.T) {
+		mp3, err := createMP3File(nil)
+		test.AssertError(t, err, ErrInvalidFile)
+		if mp3 != nil {
+			t.Fatalf("got: %v, expected: %v", mp3, nil)
+		}
+	})
+}
+
+func TestLoadSound(t *testing.T) {
+	t.Run("load sound for valid DCA file", func(t *testing.T) {
+		dir, _ := ioutil.TempDir("", "*")
+		defer os.RemoveAll(dir)
+
+		dca, mp3, err := CreateDCAFile(dir, testURL, "00:00", 10)
+		defer DeleteFile(dca.Name())
+		defer DeleteFile(mp3.Name())
+		test.AssertError(t, err, nil)
+
+		_, err = LoadSound(dca.Name())
+		test.AssertError(t, err, nil)
+	})
 }

@@ -18,6 +18,8 @@ require (
 	github.com/dop251/goja v0.0.0-20220516123900-4418d4575a41 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
+	github.com/h2non/filetype v1.1.3 // indirect
+	github.com/hajimehoshi/go-mp3 v0.3.3 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/u2takey/go-utils v0.3.1 // indirect
 	golang.org/x/crypto v0.0.0-20210421170649-83a5a9bb288b // indirect

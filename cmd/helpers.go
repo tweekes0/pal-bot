@@ -8,10 +8,10 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/tweekes0/pal-bot/config"
 	"github.com/tweekes0/pal-bot/internal/models"
 	"github.com/tweekes0/pal-bot/internal/sounds"
-	_ "github.com/mattn/go-sqlite3"
 )
 
 // Descriptions for commands
@@ -24,6 +24,7 @@ const (
 	soundsDesc   = "List all available sounds. Use **![SOUNDNAME] to play soundbite"
 	commandsDesc = "List all available commands"
 	helpDesc     = "Get help and usage for specified commands"
+	uploadDesc   = "Upload an mp3 and create a sounbite from it"
 
 	clipHelp = `**!clip** [SOUNDNAME] [YOUTUBE_URL] <START_TIME>(optional) <DURATION>(optional)
 **Example:** !clip coolsound youtube.com/ID 00:23 5
@@ -37,6 +38,9 @@ Displays Help information for the 'clip' command`
 	soundsHelp = `**![SOUNDNAME]** to play soundbite
 **Example:** !jigglypuff
 Plays the 'jigglypuff' soundbite`
+	uploadHelp = `**!upload** [SOUNDNAME]
+**Example:** !upload jigglypuff
+Uploads an attached MP3 file and creates a soundbite named 'jigglypuff'`
 )
 
 // Struct to structure command received from *discordgo.Message.Content
@@ -221,7 +225,7 @@ func (ctx *Context) getCommands(prefix string) Commands {
 	}
 	commands[fmt.Sprint(prefix, "leave")] = Command{
 		Description: leaveDesc,
-		Help:        leaveDesc, 
+		Help:        leaveDesc,
 		Action:      ctx.leaveCommand(),
 	}
 	commands[fmt.Sprint(prefix, "clip")] = Command{
@@ -248,6 +252,11 @@ func (ctx *Context) getCommands(prefix string) Commands {
 		Description: helpDesc,
 		Help:        helpHelp,
 		Action:      ctx.helpCommand(),
+	}
+	commands[fmt.Sprint(prefix, "upload")] = Command{
+		Description: uploadDesc,
+		Help:        uploadHelp,
+		Action:      ctx.uploadCommand(),
 	}
 
 	return commands

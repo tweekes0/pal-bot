@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"sort"
 	"strings"
 
@@ -296,6 +297,63 @@ func (ctx *Context) helpCommand() func(*discordgo.Session, *discordgo.MessageCre
 			if command.Help != "" {
 				ctx.help(s, m, name)
 			}
+		}
+
+		return nil
+	}
+}
+
+func (ctx *Context) upload(s *discordgo.Session, m *discordgo.MessageCreate, name string) error {
+	if len(m.Attachments) == 0 {
+		return ErrNoAttachments
+	}
+
+	url := m.Attachments[0].URL
+	mp3, err := sounds.DownloadFileFromURL(name, url, 10)
+	if err != nil {
+		return err
+	}
+	defer sounds.DeleteFile(mp3.Name())
+	mp3.Seek(0, io.SeekStart)
+
+	f, err := sounds.MP3ToDCA(config.AUDIO_DIR, mp3)
+	if err != nil {
+		return err
+	}
+	
+	hash, err := sounds.HashFile(f.Name())
+	if err != nil {
+		return err
+	}
+
+	_, err = ctx.soundbiteModel.Insert(name,m.Author.Username, m.Author.ID, f.Name(), hash)
+	if err != nil {
+		return err
+	}
+
+	ms := &discordgo.MessageSend{
+		Content: fmt.Sprintf("Your clip is ready. Play it with **!%v**", name),
+		Files:   []*discordgo.File{createDiscordFile(name, mp3)},
+	}
+
+	_, err = s.ChannelMessageSendComplex(m.ChannelID, ms)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return nil
+}
+
+func (ctx *Context) uploadCommand() func(*discordgo.Session, *discordgo.MessageCreate, []string) error {
+	return func(s *discordgo.Session, m *discordgo.MessageCreate, st[]string) error {
+		if len(st) < 1 {
+			ctx.help(s, m, "delete")
+			return ErrNotEnoughArgs
+		}
+	 
+		err := ctx.upload(s, m, st[0])
+		if err != nil {
+			return err
 		}
 
 		return nil

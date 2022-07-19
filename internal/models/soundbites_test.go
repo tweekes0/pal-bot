@@ -232,3 +232,53 @@ func TestUserCreatedSound(t *testing.T) {
 		test.AssertError(t, err, ErrCommandOwnership)
 	})
 }
+
+func updateNameTestFunc(t *testing.T, oldName, newName string, expectedErr error) {
+	m, teardown := modelsTestSetup(t)
+	defer teardown()
+
+	_, _ = mockInsert(m, s1)
+	_, _ = mockInsert(m, s2)
+
+	err := m.UpdateName(oldName, newName)
+
+	test.AssertError(t, err, expectedErr)
+}
+
+func TestUpdateName(t *testing.T) {
+	tt := []struct {
+		description string
+		oldName string
+		newName string
+		expectedErr error
+		testFunc func(*testing.T, string, string, error)
+	} {
+		{
+			description: "update single soundbite",
+			oldName: s1.Name,
+			newName: s3.Name,
+			expectedErr: nil,
+			testFunc: updateNameTestFunc,
+		},
+		{
+			description: "update soundbite with existing name",
+			oldName: s1.Name,
+			newName: s2.Name,
+			expectedErr: ErrUniqueConstraint,
+			testFunc: updateNameTestFunc,
+		},
+		{
+			description: "update non-existent soundbite",
+			oldName: s3.Name,
+			newName: s2.Name,
+			expectedErr: ErrUniqueConstraint,
+			testFunc: updateNameTestFunc,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.description, func(t *testing.T) {
+			tc.testFunc(t, tc.oldName, tc.newName, tc.expectedErr)
+		})
+	}
+}

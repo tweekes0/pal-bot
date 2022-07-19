@@ -174,6 +174,26 @@ func (m *SoundbiteModel) Delete(name, uid string) error {
 	return nil
 }
 
+func (m *SoundbiteModel) UpdateName(oldName, newName string) error {
+	exists, err := m.Exists(newName, "")
+	if err != nil {
+		return err
+	}
+
+	if exists {
+		return ErrUniqueConstraint
+	}
+
+	stmt := `UPDATE soundbites set name = ? where name = ?`
+	
+	_, err = m.DB.Query(stmt, newName, oldName)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Checks that the user_id of the soundbite belongs to the user requesting the delete
 func (m *SoundbiteModel) userCreatedSound(name, uid string) error {
 	var exists bool

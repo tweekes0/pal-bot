@@ -72,12 +72,11 @@ func (m *SoundbiteModel) Insert(name, username, uid, filepath, filehash string) 
 // Gets a Soundbite based on the name command
 func (m *SoundbiteModel) Get(name string) (*Soundbite, error) {
 	stmt := `SELECT * FROM soundbites WHERE name = ?;`
-	row := m.DB.QueryRow(stmt, name)
 
 	var date string
 	s := &Soundbite{}
 
-	err := row.Scan(&s.ID, &s.Name, &s.Username, &s.UserID, &s.FilePath, &s.FileHash, &date)
+	err := m.DB.QueryRow(stmt, name).Scan(&s.ID, &s.Name, &s.Username, &s.UserID, &s.FilePath, &s.FileHash, &date)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNoRecords

@@ -46,7 +46,6 @@ Commands must be prefixed with prefix defined in 'config.toml'
 | **join**     | Joins to the user's current VoiceChannel                      |
 | **leave**    | Leaves the current VoiceChannel                               |
 | **ping**     | Pong :D                                                       |
-| **play**     | Play a sound that has been clipped. !help play for more info. |
 | **sounds**   | List all available sounds                                     |
 
 ## Examples
@@ -54,7 +53,7 @@ Commands must be prefixed with prefix defined in 'config.toml'
 - #### Create a custom length soundbite and play it in your current VoiceChannel
 ```
 !clip jigglypuff https://www.youtube.com/watch?v=d2NTtbusUso 00:06 8 
-!play jigglypuff
+!jigglypuff
 ```
 
 - #### Delete the jigglypuff soundbite

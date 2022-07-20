@@ -42,7 +42,7 @@ func downloadYoutubeVideo(url string) (*os.File, time.Duration, error) {
 
 // Converts an mp4 file to a AAC file.
 func createAACFile(path, url, startTime string, duration int) (*os.File, error) {
-	videoFile, d,  err := downloadYoutubeVideo(url)
+	videoFile, d, err := downloadYoutubeVideo(url)
 	if err != nil {
 		return nil, err
 	}
@@ -55,16 +55,15 @@ func createAACFile(path, url, startTime string, duration int) (*os.File, error) 
 	if st.Seconds() > d.Seconds() {
 		return nil, ErrInvalidStartTime
 	}
-	
+
 	if duration > 10 || duration < 1 {
 		return nil, ErrInvalidDuration
 	}
-	
+
 	if startTime == "" {
 		startTime = "00:00"
 		duration = 10
 	}
-
 
 	fname := getFilename(videoFile.Name())
 	output := fmt.Sprintf("%v/%v.aac", path, fname)

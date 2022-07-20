@@ -17,7 +17,7 @@ func modelsTestSetup(t *testing.T) (SoundbiteModel, func()) {
 	f, err := ioutil.TempFile("", "*")
 	if err != nil {
 		log.Fatalf("failed to create file: %v", err)
-	}	
+	}
 
 	db, err := sql.Open(config.DB_DRIVER, f.Name())
 	if err != nil {

@@ -16,8 +16,8 @@ import (
 func isMP3(f *os.File) bool {
 	buf, _ := ioutil.ReadFile(f.Name())
 	t, _ := filetype.Audio(buf)
-	
-	return t.MIME.Value == "audio/mpeg" 
+
+	return t.MIME.Value == "audio/mpeg"
 }
 
 // Checks the duration of a MP3 file
@@ -28,7 +28,7 @@ func getMP3Duration(f *os.File) (int, error) {
 	}
 	defer rd.Close()
 
-	d, err  := mp3.NewDecoder(rd)
+	d, err := mp3.NewDecoder(rd)
 	if err != nil {
 		return 0, err
 	}
@@ -50,7 +50,7 @@ func validateMP3(f *os.File, maxDuration int) error {
 		return err
 	}
 
-	if dur >  maxDuration {
+	if dur > maxDuration {
 		return ErrLengthTooLong
 	}
 
@@ -70,7 +70,7 @@ func DownloadFileFromURL(name, url string, maxDuration int) (*os.File, error) {
 
 	if _, err = io.Copy(f, resp.Body); err != nil {
 		return nil, err
-	}	
+	}
 	defer resp.Body.Close()
 
 	if err = validateMP3(f, maxDuration); err != nil {

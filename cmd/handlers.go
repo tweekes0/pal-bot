@@ -39,7 +39,7 @@ func (ctx *Context) messageCreate(s *discordgo.Session, m *discordgo.MessageCrea
 		}
 	} else {
 		sl := strings.Split(c.command, ctx.botCfg.CommandPrefix)
-		soundName := sl[len(sl) - 1]
+		soundName := sl[len(sl)-1]
 		exists, err := ctx.soundbiteModel.Exists(soundName, "")
 		if err != nil {
 			ctx.errorLogger.Println(err)

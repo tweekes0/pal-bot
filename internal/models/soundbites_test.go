@@ -103,7 +103,6 @@ func TestGet(t *testing.T) {
 		test.AssertError(t, err, nil)
 		test.AssertType(t, b1, s1)
 
-
 		b2, err := m.Get(s2.Name)
 		b2.Created = time.Time{}
 		test.AssertError(t, err, nil)
@@ -124,7 +123,7 @@ func TestGet(t *testing.T) {
 
 func TestGetAll(t *testing.T) {
 	t.Run("get all from empty table", func(t *testing.T) {
-		m, teardown := modelsTestSetup(t)	
+		m, teardown := modelsTestSetup(t)
 		defer teardown()
 
 		sounds, err := m.GetAll()
@@ -141,9 +140,9 @@ func TestGetAll(t *testing.T) {
 
 		expected := []*Soundbite{s1, s2, s3}
 
-		_,_ = mockInsert(m, s1)
-		_,_ = mockInsert(m, s2)
-		_,_ = mockInsert(m, s3)
+		_, _ = mockInsert(m, s1)
+		_, _ = mockInsert(m, s2)
+		_, _ = mockInsert(m, s3)
 
 		sounds, err := m.GetAll()
 		for _, s := range sounds {
@@ -224,7 +223,7 @@ func TestUserCreatedSound(t *testing.T) {
 		defer teardown()
 
 		_, _ = mockInsert(m, s1)
-		
+
 		err := m.userCreatedSound(s1.Name, s1.UserID)
 		test.AssertError(t, err, nil)
 
@@ -248,31 +247,31 @@ func updateNameTestFunc(t *testing.T, oldName, newName string, expectedErr error
 func TestUpdateName(t *testing.T) {
 	tt := []struct {
 		description string
-		oldName string
-		newName string
+		oldName     string
+		newName     string
 		expectedErr error
-		testFunc func(*testing.T, string, string, error)
-	} {
+		testFunc    func(*testing.T, string, string, error)
+	}{
 		{
 			description: "update single soundbite",
-			oldName: s1.Name,
-			newName: s3.Name,
+			oldName:     s1.Name,
+			newName:     s3.Name,
 			expectedErr: nil,
-			testFunc: updateNameTestFunc,
+			testFunc:    updateNameTestFunc,
 		},
 		{
 			description: "update soundbite with existing name",
-			oldName: s1.Name,
-			newName: s2.Name,
+			oldName:     s1.Name,
+			newName:     s2.Name,
 			expectedErr: ErrUniqueConstraint,
-			testFunc: updateNameTestFunc,
+			testFunc:    updateNameTestFunc,
 		},
 		{
 			description: "update non-existent soundbite",
-			oldName: s3.Name,
-			newName: s2.Name,
+			oldName:     s3.Name,
+			newName:     s2.Name,
 			expectedErr: ErrUniqueConstraint,
-			testFunc: updateNameTestFunc,
+			testFunc:    updateNameTestFunc,
 		},
 	}
 

@@ -135,7 +135,7 @@ func (m *SoundbiteModel) GetAll() ([]*Soundbite, error) {
 	return soundbites, nil
 }
 
-// Check whether a soundbite exists based on the name of the command and it's filehash 
+// Check whether a soundbite exists based on the name of the command and it's filehash
 func (m *SoundbiteModel) Exists(name, hash string) (bool, error) {
 	var exists bool
 
@@ -185,7 +185,7 @@ func (m *SoundbiteModel) UpdateName(oldName, newName string) error {
 	}
 
 	stmt := `UPDATE soundbites SET name = ? where name = ?`
-	
+
 	_, err = m.DB.Exec(stmt, newName, oldName)
 	if err != nil {
 		return err

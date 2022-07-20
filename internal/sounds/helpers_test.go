@@ -54,7 +54,7 @@ func startToDurationTestFunc(t *testing.T, input, expectedInput string, expected
 	if err == nil {
 		test.AssertType(t, got, expected)
 	}
-		
+
 }
 
 func TestStartTimeToDuration(t *testing.T) {
@@ -68,24 +68,24 @@ func TestStartTimeToDuration(t *testing.T) {
 	}{
 		{
 			description: "minute and second to duration",
-			input: "12:12",
-			expected: "12m12s",
+			input:       "12:12",
+			expected:    "12m12s",
 			expectedErr: nil,
-			testFunc: startToDurationTestFunc,
-		}, 
-		{
-			description: "hour, minute and second to duration",
-			input: "01:12:30",
-			expected: "01h12m30s",
-			expectedErr: nil,
-			testFunc: startToDurationTestFunc,
+			testFunc:    startToDurationTestFunc,
 		},
 		{
-			description: "invalid start time", 
-			input: "99:99",
-			expected: "09m09s",
+			description: "hour, minute and second to duration",
+			input:       "01:12:30",
+			expected:    "01h12m30s",
+			expectedErr: nil,
+			testFunc:    startToDurationTestFunc,
+		},
+		{
+			description: "invalid start time",
+			input:       "99:99",
+			expected:    "09m09s",
 			expectedErr: ErrInvalidStartTime,
-			testFunc: startToDurationTestFunc,
+			testFunc:    startToDurationTestFunc,
 		},
 	}
 

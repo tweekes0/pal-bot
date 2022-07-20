@@ -21,7 +21,7 @@ func DeleteFile(filename string) error {
 }
 
 const (
-	mmssRegEx = "[0-5][0-9]:[0-5][0-9]"
+	mmssRegEx   = "[0-5][0-9]:[0-5][0-9]"
 	hhmmssRegEx = "0[0-9]:[0-5][0-9]:[0-5][0-9]"
 )
 
@@ -30,7 +30,7 @@ func HashFile(filename string) (string, error) {
 	f, err := os.Open(filename)
 	if err != nil {
 		return "", nil
-	}	
+	}
 	defer f.Close()
 
 	h := sha256.New()
@@ -50,7 +50,7 @@ func getFilename(filepath string) string {
 	return fn
 }
 
-// Converts the starttime string(00:00:00 or 00:00) to time.Duration 
+// Converts the starttime string(00:00:00 or 00:00) to time.Duration
 func startTimeToDuration(t string) (time.Duration, error) {
 	b1, _ := regexp.MatchString(mmssRegEx, t)
 	b2, _ := regexp.MatchString(hhmmssRegEx, t)

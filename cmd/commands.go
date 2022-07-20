@@ -237,19 +237,19 @@ func (ctx *Context) pingCommand() func(*discordgo.Session, *discordgo.MessageCre
 // Bot will send the list commands and their descriptiions
 func (ctx *Context) listCommands(s *discordgo.Session, m *discordgo.MessageCreate) error {
 	var sb strings.Builder
-		keys := []string{}
+	keys := []string{}
 
-		for k := range ctx.commands {
-			keys = append(keys, k)
-		}
-		sort.Strings(keys)
+	for k := range ctx.commands {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
 
-		for _, k := range keys {
-			sb.Write([]byte(fmt.Sprintf("**%v**:\t%v\n", k, ctx.commands[k].Description)))
-		}
+	for _, k := range keys {
+		sb.Write([]byte(fmt.Sprintf("**%v**:\t%v\n", k, ctx.commands[k].Description)))
+	}
 
-		_, _ = s.ChannelMessageSend(m.ChannelID, sb.String())
-		return nil
+	_, _ = s.ChannelMessageSend(m.ChannelID, sb.String())
+	return nil
 }
 
 // Wrapper function for the 'commands' command
@@ -303,13 +303,13 @@ func (ctx *Context) upload(s *discordgo.Session, m *discordgo.MessageCreate, nam
 	if err != nil {
 		return err
 	}
-	
+
 	hash, err := sounds.HashFile(f.Name())
 	if err != nil {
 		return err
 	}
 
-	_, err = ctx.soundbiteModel.Insert(name,m.Author.Username, m.Author.ID, f.Name(), hash)
+	_, err = ctx.soundbiteModel.Insert(name, m.Author.Username, m.Author.ID, f.Name(), hash)
 	if err != nil {
 		return err
 	}
@@ -328,12 +328,12 @@ func (ctx *Context) upload(s *discordgo.Session, m *discordgo.MessageCreate, nam
 }
 
 func (ctx *Context) uploadCommand() func(*discordgo.Session, *discordgo.MessageCreate, []string) error {
-	return func(s *discordgo.Session, m *discordgo.MessageCreate, st[]string) error {
+	return func(s *discordgo.Session, m *discordgo.MessageCreate, st []string) error {
 		if len(st) < 1 {
 			ctx.help(s, m, "upload")
 			return ErrNotEnoughArgs
 		}
-	 
+
 		err := ctx.upload(s, m, st[0])
 		if err != nil {
 			return err
@@ -355,7 +355,7 @@ func (ctx *Context) rename(s *discordgo.Session, m *discordgo.MessageCreate, old
 	}
 
 	delete(ctx.soundbiteCache, oldName)
-	
+
 	ctx.soundbiteCache[newName] = sound
 	return nil
 }
@@ -363,7 +363,7 @@ func (ctx *Context) rename(s *discordgo.Session, m *discordgo.MessageCreate, old
 func (ctx *Context) renameCommand() func(*discordgo.Session, *discordgo.MessageCreate, []string) error {
 	return func(s *discordgo.Session, m *discordgo.MessageCreate, st []string) error {
 		if len(st) < 2 {
-			ctx.help(s, m, "rename")			
+			ctx.help(s, m, "rename")
 			return ErrNotEnoughArgs
 		}
 
@@ -373,5 +373,5 @@ func (ctx *Context) renameCommand() func(*discordgo.Session, *discordgo.MessageC
 		}
 
 		return nil
-	}	
+	}
 }

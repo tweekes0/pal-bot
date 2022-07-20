@@ -5,7 +5,6 @@ go 1.18
 require (
 	github.com/BurntSushi/toml v1.1.0
 	github.com/bwmarrin/discordgo v0.25.0
-	github.com/go-sql-driver/mysql v1.6.0
 	github.com/h2non/filetype v1.1.3
 	github.com/hajimehoshi/go-mp3 v0.3.3
 	github.com/kkdai/youtube/v2 v2.7.15

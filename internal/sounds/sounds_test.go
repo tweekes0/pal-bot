@@ -79,7 +79,7 @@ func TestCreateAACFile(t *testing.T) {
 			expected: nil,
 		},
 		{
-			description: "create AAC from valid youtube url and wtih no start time",
+			description: "create AAC from valid youtube url and with no start time",
 			input: fileInput{
 				url:      "https://www.youtube.com/watch?v=vkFRAIKpKmE",
 				duration: 10,

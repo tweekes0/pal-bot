@@ -12,7 +12,7 @@ import (
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 )
 
-// Downloads a youtube video and returns an mp4 file if the download is succesful.
+// Downloads a youtube video and returns an mp4 file if the download is successful.
 func downloadYoutubeVideo(url string) (*os.File, time.Duration, error) {
 	client := &youtube.Client{}
 	video, err := client.GetVideo(url)

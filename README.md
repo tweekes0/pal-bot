@@ -64,3 +64,20 @@ Commands must be prefixed with prefix defined in 'config.toml'
 ```
 !delete jigglypuff
 ```
+
+- #### Rename soundbite and play it
+```
+!rename jigglypuff jp
+!jp
+```
+
+## Acknowledgements
+Pal Bot has been brought to you in part by:
+
+- [discordgo](https://github.com/bwmarrin/discordgo) - Go bindings for Discord
+- [go-sqlite3](https://github.com/mattn/go-sqlite3) - Sqlite3 driver for go using database/sql
+- [filetype](https://github.com/h2non/filetype) - Fast, dependency-free Go package to infer binary file types based on the magic numbers header signature
+- [go-mp3](https://github.com/hajimehoshi/go-mp3) - An MP3 decoder in pure Go
+- [youtube](https://github.com/kkdai/youtube/) - Go package to download Youtube videos
+- [ffmpeg-go](https://github.com/u2takey/ffmpeg-go) - Golang bindings for ffmpeg
+- [dca](https://github.com/bwmarrin/dca) - Specification & Tool the Discord Audio (dca) file format

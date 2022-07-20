@@ -21,7 +21,7 @@ const (
 	leaveDesc    = "Leaves the current VoiceChannel"
 	clipDesc     = "Take a youtube video and create a soundbite from it. Soundbites cannot be longer than 10 seconds.  **!help clip** for more info."
 	deleteDesc   = "Delete a clipped soundbite the user created.  **!help delete** for more info."
-	soundsDesc   = "List all available sounds. Use **![SOUNDNAME] to play soundbite"
+	soundsDesc   = "List all available sounds. Use **![SOUNDNAME]** to play soundbite"
 	commandsDesc = "List all available commands"
 	helpDesc     = "Get help and usage for specified commands"
 	uploadDesc   = "Upload an mp3 and create a sounbite from it"

@@ -36,7 +36,7 @@ Deletes the soundbite the user created named 'pika'`
 	helpHelp = `**!help** [COMAND_NAME]
 **Example:** !help clip
 Displays Help information for the 'clip' command`
-	renameHelp = `**!rename [OLD_SOUNDNAME] [NEW_SOUNDNAME]
+	renameHelp = `**!rename** [OLD_SOUNDNAME] [NEW_SOUNDNAME]
 **Example:** !rename jigglypuff jp
 Rename the 'jigglypuff' soundbite to 'jp'`
 	soundsHelp = `**![SOUNDNAME]** to play soundbite

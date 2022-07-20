@@ -1,4 +1,6 @@
-# Pal Bot
+# Pal Bot 
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/tweekes0/pal-bot)](https://goreportcard.com/report/github.com/tweekes0/pal-bot)
 
 Pal Bot is a discord bot that leverages
 the [discordgo](https://github.com/bwmarrin/discordgo) library to create soundbites from Youtube videos and play them to your Discord server. This bot is heavily inspired by [Beginbot's](https://www.twitch.tv/beginbot) sound command that allows viewers to create sound bites and have them play on stream.

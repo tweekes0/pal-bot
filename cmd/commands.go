@@ -94,23 +94,6 @@ func (ctx *Context) playSound(s *discordgo.Session, m *discordgo.MessageCreate, 
 	return nil
 }
 
-// Wrapper function for the 'play' command
-func (ctx *Context) playCommand() func(*discordgo.Session, *discordgo.MessageCreate, []string) error {
-	return func(s *discordgo.Session, m *discordgo.MessageCreate, st []string) error {
-		if len(st) < 1 {
-			ctx.help(s, m, "play")
-			return ErrNotEnoughArgs
-		}
-
-		name := st[0]
-		if err := ctx.playSound(s, m, name); err != nil {
-			return err
-		}
-
-		return nil
-	}
-}
-
 // Bot will create audio file from youtube video
 func (ctx *Context) clip(s *discordgo.Session, m *discordgo.MessageCreate, name, url, startTime string, duration int) error {
 	start, dur := getRuntime(startTime, duration)

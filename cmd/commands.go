@@ -114,7 +114,7 @@ func (ctx *Context) clip(s *discordgo.Session, m *discordgo.MessageCreate, name,
 	}
 
 	ms := &discordgo.MessageSend{
-		Content: fmt.Sprintf("Your clip is ready. Play it with **!play %v**", name),
+		Content: fmt.Sprintf("Your clip is ready. Play it with **!%v**", name),
 		Files:   []*discordgo.File{createDiscordFile(name, mp3)},
 	}
 

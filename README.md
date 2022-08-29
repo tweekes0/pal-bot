@@ -54,7 +54,7 @@ Commands must be prefixed with prefix defined in 'config.toml'
 
 ## Examples
 
-- #### Create a custom length soundbite and play it in your current VoiceChannel
+- #### Create a 8 second soundbite and play it in your current VoiceChannel
 ```
 !clip jigglypuff https://www.youtube.com/watch?v=d2NTtbusUso 00:06 8 
 !jigglypuff

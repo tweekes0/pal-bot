@@ -292,7 +292,7 @@ func (ctx *Context) upload(s *discordgo.Session, m *discordgo.MessageCreate, nam
 	}
 
 	url := m.Attachments[0].URL
-	mp3, err := sounds.DownloadFileFromURL(name, url, 10)
+	mp3, err := sounds.DownloadFileFromURL(name, url)
 	if err != nil {
 		return err
 	}

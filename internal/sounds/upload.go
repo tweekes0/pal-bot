@@ -10,6 +10,7 @@ import (
 
 	"github.com/h2non/filetype"
 	mp3 "github.com/hajimehoshi/go-mp3"
+	"github.com/tweekes0/pal-bot/config"
 )
 
 // Checks whether a file is an mp3 based on its headers
@@ -40,7 +41,7 @@ func getMP3Duration(f *os.File) (int, error) {
 }
 
 // Ensures the file is an MP3 and less than specified duration(in seconds)
-func validateMP3(f *os.File, maxDuration int) error {
+func validateMP3(f *os.File) error {
 	if !isMP3(f) {
 		return ErrInvalidFile
 	}
@@ -50,14 +51,15 @@ func validateMP3(f *os.File, maxDuration int) error {
 		return err
 	}
 
-	if dur > maxDuration {
+	if dur > config.UPLOAD_MAX_DURATION {
 		return ErrLengthTooLong
 	}
 
 	return nil
 }
 
-func DownloadFileFromURL(name, url string, maxDuration int) (*os.File, error) {
+// Download youtube video
+func DownloadFileFromURL(name, url string) (*os.File, error) {
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
@@ -73,7 +75,7 @@ func DownloadFileFromURL(name, url string, maxDuration int) (*os.File, error) {
 	}
 	defer resp.Body.Close()
 
-	if err = validateMP3(f, maxDuration); err != nil {
+	if err = validateMP3(f); err != nil {
 		DeleteFile(f.Name())
 		return nil, err
 	}
@@ -83,6 +85,7 @@ func DownloadFileFromURL(name, url string, maxDuration int) (*os.File, error) {
 	return f, nil
 }
 
+// Converts an mp3 file to a DCA file
 func MP3ToDCA(path string, f *os.File) (*os.File, error) {
 	c1 := exec.Command("ffmpeg", "-i", f.Name(), "-f", "s16le", "-ar", "48000", "-ac", "2", "pipe:1")
 	c2 := exec.Command("dca")

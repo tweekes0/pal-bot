@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/kkdai/youtube/v2"
+	"github.com/tweekes0/pal-bot/config"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 )
 
@@ -56,13 +57,8 @@ func createAACFile(path, url, startTime string, duration int) (*os.File, error) 
 		return nil, ErrInvalidStartTime
 	}
 
-	if duration > 10 || duration < 1 {
+	if duration > config.CLIP_MAX_DURATION || duration < 1 {
 		return nil, ErrInvalidDuration
-	}
-
-	if startTime == "" {
-		startTime = "00:00"
-		duration = 10
 	}
 
 	fname := getFilename(videoFile.Name())
@@ -75,7 +71,6 @@ func createAACFile(path, url, startTime string, duration int) (*os.File, error) 
 
 	err = ffmpeg.Input(videoFile.Name()).
 		Output(output, kwargs).OverWriteOutput().Run()
-
 	if err != nil {
 		return nil, err
 	}

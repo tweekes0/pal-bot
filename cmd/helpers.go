@@ -142,12 +142,12 @@ func parseClipCommand(args []string) (*clipArgs, error) {
 		c.Name = args[0]
 		c.Url = args[1]
 		c.Start = "00:00"
-		c.Duration = 10
+		c.Duration = config.CLIP_MAX_DURATION
 	case 3:
 		c.Name = args[0]
 		c.Url = args[1]
 		c.Start = args[2]
-		c.Duration = 10
+		c.Duration = config.CLIP_MAX_DURATION
 	case 4:
 		c.Name = args[0]
 		c.Url = args[1]
@@ -181,11 +181,14 @@ func getRuntime(start string, duration int) (startTime string, dur int) {
 	switch {
 	case start == "":
 		startTime = ""
-		dur = 10
-	case start != "" && duration > 10:
+		dur = config.CLIP_MAX_DURATION
+	case duration == 0:
 		startTime = start
-		dur = 10
-	case duration > 0 && duration <= 10:
+		dur = config.CLIP_MAX_DURATION
+	case start != "" && duration > config.CLIP_MAX_DURATION:
+		startTime = start
+		dur = config.CLIP_MAX_DURATION
+	case duration > 0 && duration <= config.CLIP_MAX_DURATION:
 		startTime = start
 		dur = duration
 	}

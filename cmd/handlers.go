@@ -68,8 +68,3 @@ func (ctx *Context) voiceStateChange(s *discordgo.Session, vs *discordgo.VoiceSt
 		}
 	}
 }
-
-func (ctx *Context) guildJoin(s *discordgo.Session, g *discordgo.GuildCreate) {
-	msg := "Hi @everyone, I am Pal Bot.\n**!commands** to see a list of my commands."
-	_, _ = s.ChannelMessageSend(ctx.botCfg.BotChannelID, msg)
-}

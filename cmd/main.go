@@ -84,12 +84,12 @@ func main() {
 	ctx.soundbiteModel.Initialize()
 
 	// Create a cache of all the soundbites in the db
-	soundbiteCache, err := ctx.createSoundsCache()
-	if err != nil {
-		errLog.Fatalln(err)
-	}
+	// soundbiteCache, err := ctx.createSoundsCache()
+	// if err != nil {
+	// 	errLog.Fatalln(err)
+	// }
 
-	ctx.soundbiteCache = soundbiteCache
+	// ctx.soundbiteCache = soundbiteCache
 
 	bot.AddHandler(ctx.messageCreate)
 	bot.AddHandler(ctx.voiceStateChange)

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
@@ -66,5 +67,14 @@ func (ctx *Context) voiceStateChange(s *discordgo.Session, vs *discordgo.VoiceSt
 		} else { // the bot joins a voice channel
 			ctx.joinedVoice = true
 		}
+	}
+
+	g, err := s.State.Guild(vs.GuildID)
+	if err != nil {
+		log.Fatal(err)
+	}
+	
+	if len(g.VoiceStates) == 1 && ctx.joinedVoice {
+		ctx.leaveVoice(s, nil)
 	}
 }

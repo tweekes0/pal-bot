@@ -13,6 +13,8 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+type soundCache map[string]*models.Soundbite
+
 // Struct that holds the bot's loggers and state necessary
 // to control the bot
 type Context struct {
@@ -25,7 +27,7 @@ type Context struct {
 	soundbiteModel *models.SoundbiteModel
 	joinedVoice    bool
 	isSpeaking     bool
-	soundbiteCache map[string]*models.Soundbite
+	soundbiteCache soundCache
 }
 
 func main() {
@@ -89,7 +91,7 @@ func main() {
 	// 	errLog.Fatalln(err)
 	// }
 
-	// ctx.soundbiteCache = soundbiteCache
+	ctx.soundbiteCache = soundCache{}
 
 	bot.AddHandler(ctx.messageCreate)
 	bot.AddHandler(ctx.voiceStateChange)

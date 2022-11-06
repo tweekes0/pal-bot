@@ -2,7 +2,8 @@
 FROM golang:1.18 as build
 WORKDIR /usr/local/go/src/pal-bot
 COPY go.mod go.sum ./
-RUN go mod download && go mod verify
+RUN go mod download 
+RUN go mod verify
 RUN go install github.com/bwmarrin/dca/cmd/dca@latest
 COPY . ./
 RUN GOOS=linux CGO_ENABLED=1 GOARCH=amd64 go build -ldflags="-w -s" -o /usr/local/bin/pal-bot ./cmd/

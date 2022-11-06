@@ -235,11 +235,11 @@ func (ctx *Context) getCommands(prefix string) Commands {
 		Help:        leaveDesc,
 		Action:      ctx.leaveCommand(),
 	}
-	commands[fmt.Sprint(prefix, "clip")] = Command{
-		Description: clipDesc,
-		Help:        clipHelp,
-		Action:      ctx.clipCommand(),
-	}
+	// commands[fmt.Sprint(prefix, "clip")] = Command{
+	// 	Description: clipDesc,
+	// 	Help:        clipHelp,
+	// 	Action:      ctx.clipCommand(),
+	// }
 	commands[fmt.Sprint(prefix, "delete")] = Command{
 		Description: deleteDesc,
 		Help:        deleteHelp,

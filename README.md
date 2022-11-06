@@ -1,4 +1,4 @@
-# Pal Bot 
+# Pal Bot
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/tweekes0/pal-bot)](https://goreportcard.com/report/github.com/tweekes0/pal-bot)
 
@@ -38,40 +38,38 @@ go run ./cmd/
 ```
 
 ## Commands
+
 Commands must be prefixed with prefix defined in 'config.toml'
-| **Command**  | **Description**                                               |
+| **Command** | **Description** |
 | ------------ | ------------------------------------------------------------- |
-| **clip**     | Take a youtube video and create a soundbite from it           |
-| **commands** | List all available commands                                   |
-| **delete**   | Delete a soundbite the user created                           |
-| **help**     | Get help and usage for specified command                      |
-| **join**     | Joins to the user's current VoiceChannel                      |
-| **leave**    | Leaves the current VoiceChannel                               |
-| **ping**     | Pong :D                                                       |
-| **sounds**   | List all available sounds                                     |
-| **!upload**  | Upload an mp3 and create a sounbite from it                   |
-| **!rename**  | Rename soundbiets                                             |
+| **clip** | Take a youtube video and create a soundbite from it (DOES NOT WORK) |
+| **commands** | List all available commands |
+| **delete** | Delete a soundbite the user created |
+| **help** | Get help and usage for specified command |
+| **join** | Joins to the user's current VoiceChannel |
+| **leave** | Leaves the current VoiceChannel |
+| **ping** | Pong :D |
+| **sounds** | List all available sounds |
+| **upload** | Upload an mp3 and create a sounbite from it |
+| **rename** | Rename soundbiets |
 
 ## Examples
 
-- #### Create a 8 second soundbite and play it in your current VoiceChannel
-```
-!clip jigglypuff https://www.youtube.com/watch?v=d2NTtbusUso 00:06 8 
-!jigglypuff
-```
-
 - #### Delete the jigglypuff soundbite
+
 ```
 !delete jigglypuff
 ```
 
 - #### Rename soundbite and play it
+
 ```
 !rename jigglypuff jp
 !jp
 ```
 
 ## Acknowledgements
+
 Pal Bot has been brought to you in part by:
 
 - [discordgo](https://github.com/bwmarrin/discordgo) - Go bindings for Discord

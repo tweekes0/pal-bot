@@ -1,11 +1,14 @@
 package sounds
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -21,7 +24,7 @@ func DeleteFile(filename string) error {
 }
 
 const (
-	mmssRegEx   = "[0-5][0-9]:[0-5][0-9]"
+	mmssRegEx   = "[0-5]?[0-9]:[0-5][0-9]"
 	hhmmssRegEx = "0[0-9]:[0-5][0-9]:[0-5][0-9]"
 )
 
@@ -50,8 +53,18 @@ func getFilename(filepath string) string {
 	return fn
 }
 
-// Converts the starttime string(00:00:00 or 00:00) to time.Duration
-func startTimeToDuration(t string) (time.Duration, error) {
+// Converts the starttime string(00:00:00 or 00:00 or 00) to time.Duration
+func stringToDuration(t string) (time.Duration, error) {
+	if checkShortDuration(t) {
+		i, err := strconv.Atoi(t)
+		if err != nil {
+			return 0, ErrInvalidStartTime
+		}
+
+		s := fmt.Sprintf("%02vs", i)
+		return time.ParseDuration(s)
+	}
+
 	b1, _ := regexp.MatchString(mmssRegEx, t)
 	b2, _ := regexp.MatchString(hhmmssRegEx, t)
 	if !b1 && !b2 {
@@ -72,4 +85,29 @@ func startTimeToDuration(t string) (time.Duration, error) {
 
 	dur := fmt.Sprintf("%02vm%02vs", m, s)
 	return time.ParseDuration(dur)
+}
+
+func getVideoDuration(url string) (string, error) {
+	w := new(bytes.Buffer)
+	c := exec.Command("youtube-dl", "--get-duration", url)
+	c.Stdout = w
+
+	if err := c.Run(); err != nil {
+		return "", err
+	}
+
+	s := strings.ReplaceAll(w.String(), "\n", "")
+	return s, nil
+}
+
+func checkShortDuration(s string) bool {
+	if len(s) < 3{
+		if _, err := strconv.Atoi(s); err != nil {
+			return false
+		}
+
+		return true
+	}
+
+	return false
 }

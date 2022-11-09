@@ -48,7 +48,7 @@ func createAACFile(path, url, startTime string, duration int) (*os.File, error) 
 		return nil, err
 	}
 
-	st, err := startTimeToDuration(startTime)
+	st, err := stringToDuration(startTime)
 	if err != nil {
 		return nil, err
 	}

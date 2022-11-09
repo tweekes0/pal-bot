@@ -47,7 +47,7 @@ func TestGetFilename(t *testing.T) {
 func startToDurationTestFunc(t *testing.T, input, expectedInput string, expectedErr error) {
 	t.Parallel()
 
-	got, err := startTimeToDuration(input)
+	got, err := stringToDuration(input)
 	expected, _ := time.ParseDuration(expectedInput)
 
 	test.AssertError(t, err, expectedErr)
@@ -57,7 +57,7 @@ func startToDurationTestFunc(t *testing.T, input, expectedInput string, expected
 
 }
 
-func TestStartTimeToDuration(t *testing.T) {
+func TeststringToDuration(t *testing.T) {
 
 	tt := []struct {
 		description string

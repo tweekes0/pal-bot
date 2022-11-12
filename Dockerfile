@@ -15,5 +15,4 @@ RUN apt-get update \
 WORKDIR /pal-bot/
 COPY --from=build /usr/local/bin/pal-bot /usr/local/go/src/pal-bot/config.toml ./
 COPY --from=build /go/bin/dca /usr/local/bin
-RUN mkdir downloads/
 ENTRYPOINT [ "./pal-bot" ]

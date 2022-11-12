@@ -235,11 +235,11 @@ func (ctx *Context) getCommands(prefix string) Commands {
 		Help:        leaveDesc,
 		Action:      ctx.leaveCommand(),
 	}
-	// commands[fmt.Sprint(prefix, "clip")] = Command{
-	// 	Description: clipDesc,
-	// 	Help:        clipHelp,
-	// 	Action:      ctx.clipCommand(),
-	// }
+	commands[fmt.Sprint(prefix, "clip")] = Command{
+		Description: clipDesc,
+		Help:        clipHelp,
+		Action:      ctx.clipCommand(),
+	}
 	commands[fmt.Sprint(prefix, "delete")] = Command{
 		Description: deleteDesc,
 		Help:        deleteHelp,
@@ -272,21 +272,6 @@ func (ctx *Context) getCommands(prefix string) Commands {
 	}
 
 	return commands
-}
-
-// Create a map for a cache of soundbites
-func (ctx *Context) createSoundsCache() (map[string]*models.Soundbite, error) {
-	sounds, err := ctx.soundbiteModel.GetAll()
-	if err != nil {
-		return nil, err
-	}
-
-	cache := make(map[string]*models.Soundbite)
-	for _, sound := range sounds {
-		cache[sound.Name] = sound
-	}
-
-	return cache, nil
 }
 
 // Load and stream a soundbite into a VoiceChannel.

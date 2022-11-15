@@ -42,7 +42,7 @@ go run ./cmd/
 Commands must be prefixed with prefix defined in 'config.toml'
 | **Command** | **Description** |
 | ------------ | ------------------------------------------------------------- |
-| **clip** | Take a youtube video and create a soundbite from it (DOES NOT WORK) |
+| **clip** | Take a youtube video and create a soundbite from it |
 | **commands** | List all available commands |
 | **delete** | Delete a soundbite the user created |
 | **help** | Get help and usage for specified command |
@@ -54,6 +54,13 @@ Commands must be prefixed with prefix defined in 'config.toml'
 | **rename** | Rename soundbiets |
 
 ## Examples
+
+- #### Create a 8 second soundbite and play it in your current VoiceChannel
+
+```
+!clip jigglypuff https://www.youtube.com/watch?v=d2NTtbusUso 00:06 8 
+!jigglypuff
+```
 
 - #### Delete the jigglypuff soundbite
 

@@ -10,7 +10,7 @@ import (
 
 // Handler for when the bot receives a command
 func (ctx *Context) messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-	if m.Content == "" {
+	if m.Content == "" || !strings.HasPrefix(m.Content, ctx.botCfg.CommandPrefix) {
 		return
 	}
 

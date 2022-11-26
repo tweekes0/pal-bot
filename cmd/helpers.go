@@ -52,11 +52,10 @@ type botCommand struct {
 	command string
 	args    []string
 }
-
 // Parses the specific command and any arguments that it may have
 func parseCommand(command string) *botCommand {
 	s := strings.Fields(command)
-
+	
 	if len(s) == 0 {
 		return nil
 	}
